@@ -14,7 +14,7 @@ const BOTHROPS_DB = [
   { id:'asper',        name:'Bothrops asper',         common:'Terciopelo / Barba Amarilla', color:'#a0845c', bodyColor:'#5a3e10', pts:120, speed:1.0,  nocturnal:false },
   { id:'jararaca',     name:'Bothrops jararaca',      common:'Jararaca del Sur',         color:'#b8a070', bodyColor:'#6b5118', pts:110, speed:0.9,  nocturnal:false },
   { id:'venezuelensis',name:'Bothrops venezuelensis', common:'Tigra Mariposa',           color:'#c8a028', bodyColor:'#855200', pts:150, speed:1.15, nocturnal:false },
-  { id:'lanceolatus',  name:'Bothrops lanceolatus',   common:'Fer-de-lance',             color:'#d4a862', bodyColor:'#7c5010', pts:130, speed:1.0,5 nocturnal:false },
+  { id:'lanceolatus',  name:'Bothrops lanceolatus',   common:'Fer-de-lance',             color:'#d4a862', bodyColor:'#7c5010', pts:130, speed:1.05, nocturnal:false },
   // --- NOCTURNAS ---
   { id:'bilineatus',   name:'Bothrops bilineatus',    common:'Víbora de Palma Verde',    color:'#5aba42', bodyColor:'#216a0a', pts:200, speed:1.3,  nocturnal:true  },
   { id:'taeniatus',    name:'Bothrops taeniatus',     common:'Jergón de Musgo',          color:'#78a640', bodyColor:'#3a5c10', pts:180, speed:1.2,  nocturnal:true  },
