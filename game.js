@@ -1,108 +1,61 @@
 /* ==========================================================================
    BOTHROPS HUNT: SELVA NUBLADA VENEZOLANA
-   Motor de Juego Principal (game.js) – Versión Expandida
+   Motor de Juego Principal (game.js) – Versión Terreno Detallado y Cámara Centrada
    ========================================================================== */
 
 'use strict';
 
 // ════════════════════════════════════════════════════════════════
-//  BASE DE DATOS CIENTÍFICA DE BOTHROPS
+//  BASE DE DATOS CIENTÍFICA DE BOTHROPS (Velocidad ajustada más lenta)
 // ════════════════════════════════════════════════════════════════
 const BOTHROPS_DB = [
   // --- DIURNAS ---
-  { id:'atrox',        name:'Bothrops atrox',        common:'Jergón del Oriente',       color:'#c4a882', bodyColor:'#8b6914', pts:100, speed:1.7, nocturnal:false },
-  { id:'asper',        name:'Bothrops asper',         common:'Terciopelo / Barba Amarilla', color:'#a0845c', bodyColor:'#5a3e10', pts:120, speed:2.0, nocturnal:false },
-  { id:'jararaca',     name:'Bothrops jararaca',      common:'Jararaca del Sur',         color:'#b8a070', bodyColor:'#6b5118', pts:110, speed:1.9, nocturnal:false },
-  { id:'venezuelensis',name:'Bothrops venezuelensis', common:'Tigra Mariposa',           color:'#c8a028', bodyColor:'#855200', pts:150, speed:2.4, nocturnal:false },
-  { id:'lanceolatus',  name:'Bothrops lanceolatus',   common:'Fer-de-lance',             color:'#d4a862', bodyColor:'#7c5010', pts:130, speed:2.1, nocturnal:false },
+  { id:'atrox',        name:'Bothrops atrox',        common:'Jergón del Oriente',       color:'#c4a882', bodyColor:'#8b6914', pts:100, speed:0.85, nocturnal:false },
+  { id:'asper',        name:'Bothrops asper',         common:'Terciopelo / Barba Amarilla', color:'#a0845c', bodyColor:'#5a3e10', pts:120, speed:1.0,  nocturnal:false },
+  { id:'jararaca',     name:'Bothrops jararaca',      common:'Jararaca del Sur',         color:'#b8a070', bodyColor:'#6b5118', pts:110, speed:0.9,  nocturnal:false },
+  { id:'venezuelensis',name:'Bothrops venezuelensis', common:'Tigra Mariposa',           color:'#c8a028', bodyColor:'#855200', pts:150, speed:1.15, nocturnal:false },
+  { id:'lanceolatus',  name:'Bothrops lanceolatus',   common:'Fer-de-lance',             color:'#d4a862', bodyColor:'#7c5010', pts:130, speed:1.0,5 nocturnal:false },
   // --- NOCTURNAS ---
-  { id:'bilineatus',   name:'Bothrops bilineatus',    common:'Víbora de Palma Verde',    color:'#5aba42', bodyColor:'#216a0a', pts:200, speed:2.8, nocturnal:true  },
-  { id:'taeniatus',    name:'Bothrops taeniatus',     common:'Jergón de Musgo',          color:'#78a640', bodyColor:'#3a5c10', pts:180, speed:2.5, nocturnal:true  },
-  { id:'pictus',       name:'Bothrops pictus',        common:'Jergón de Costa',          color:'#c8b428', bodyColor:'#7a6800', pts:160, speed:2.3, nocturnal:true  },
-  { id:'alternatus',   name:'Bothrops alternatus',    common:'Crucera / Urutú',          color:'#8a6040', bodyColor:'#422010', pts:190, speed:2.6, nocturnal:true  },
+  { id:'bilineatus',   name:'Bothrops bilineatus',    common:'Víbora de Palma Verde',    color:'#5aba42', bodyColor:'#216a0a', pts:200, speed:1.3,  nocturnal:true  },
+  { id:'taeniatus',    name:'Bothrops taeniatus',     common:'Jergón de Musgo',          color:'#78a640', bodyColor:'#3a5c10', pts:180, speed:1.2,  nocturnal:true  },
+  { id:'pictus',       name:'Bothrops pictus',        common:'Jergón de Costa',          color:'#c8b428', bodyColor:'#7a6800', pts:160, speed:1.1,  nocturnal:true  },
+  { id:'alternatus',   name:'Bothrops alternatus',    common:'Crucera / Urutú',          color:'#8a6040', bodyColor:'#422010', pts:190, speed:1.25, nocturnal:true  },
 ];
 
 // ════════════════════════════════════════════════════════════════
 //  PALETA DE COLORES DEL MOTOR PIXEL ART
 // ════════════════════════════════════════════════════════════════
 const C = {
-  '.': null,                // transparente
+  '.': null,
   // Piel y cuerpo Anggie
-  'P': '#e8b88a',           // piel base cálida
-  'p': '#d09070',           // piel sombra
-  'K': '#1a0e08',           // cabello negro
-  'k': '#2a1810',           // cabello negro sombra
+  'P': '#e8b88a', 'p': '#d09070', 'K': '#1a0e08', 'k': '#2a1810',
   // Maquillaje Anggie
-  'G': '#39b54a',           // delineado verde
-  'Y': '#f5e020',           // delineado amarillo
+  'G': '#39b54a', 'Y': '#f5e020',
   // Ropa Anggie
-  'T': '#c87858',           // camiseta terracota
-  't': '#a05838',           // terracota sombra
-  'J': '#e8dcc8',           // chaqueta beige
-  'j': '#c8b8a0',           // chaqueta sombra
-  'B': '#3060b8',           // pantalón azul campo
-  'b': '#1e4080',           // pantalón sombra
-  'R': '#c03020',           // botas rojas campo
-  // Collar perlas Anggie
-  'O': '#f0eee8',           // perlas blancas
+  'T': '#c87858', 't': '#a05838', 'J': '#e8dcc8', 'j': '#c8b8a0',
+  'B': '#3060b8', 'b': '#1e4080', 'R': '#c03020', 'O': '#f0eee8',
   // Piel Péfaur
-  'Q': '#d49060',           // piel olivácea Péfaur
-  'q': '#a86838',           // piel sombra Péfaur
-  // Cabello Péfaur
-  'g': '#a0a0a0',           // cabello gris
-  'w': '#c8c8c8',           // gris claro
-  // Ropa Péfaur
-  'C': '#7eb8d8',           // camisa azul claro
-  'c': '#5090b0',           // camisa sombra
-  // Lentes Péfaur
-  'L': '#c8a030',           // montura dorada
-  'l': '#804000',           // sombra montura
-  'e': '#80cce830',         // lente tintado
-  // Serpiente (overrideado dinámicamente)
-  'S': '#b09060',           // escama base
-  's': '#604020',           // escama sombra
-  'X': '#000000',           // pupila
-  'x': '#1a0800',           // boca/detalle
-  // Entorno
-  'D': '#1d5c2c',           // arbusto selva nublada
-  'd': '#133d1d',           // arbusto sombra
-  'F': '#2e7d32',           // árbol tronco musgo
-  'f': '#1b4f21',           // árbol sombra
-  'M': '#4caf50',           // hoja árbol
-  'm': '#2e7d32',           // hoja sombra
-  'E': '#8d6e63',           // cofre madera
-  'A': '#e8b624',           // cofre dorado
-  'H': '#0288d1',           // agua/orquídea
-  'I': '#f8bbd0',           // orquídea rosa
-  'N': '#5c3d11',           // tronco corteza
+  'Q': '#d49060', 'q': '#a86838', 'g': '#a0a0a0', 'w': '#c8c8c8',
+  'C': '#7eb8d8', 'c': '#5090b0', 'L': '#c8a030', 'l': '#804000', 'e': '#80cce830',
+  // Serpiente
+  'S': '#b09060', 's': '#604020', 'X': '#000000', 'x': '#1a0800',
+  // Entorno / Terreno RPG
+  'D': '#1d5c2c', 'd': '#133d1d', 'F': '#2e7d32', 'f': '#1b4f21',
+  'M': '#4caf50', 'm': '#2e7d32', 'E': '#8d6e63', 'A': '#e8b624',
+  'H': '#0288d1', 'I': '#f8bbd0', 'N': '#5c3d11',
+  // Roca y camino
+  'r': '#8d99ae', 'R2': '#4a5568', 'W2': '#edf2f7',
+  'w2': '#d4a373', 'w3': '#bc6c25', 'w4': '#dda15e'
 };
 
 // ════════════════════════════════════════════════════════════════
-//  SPRITES PIXEL ART (16×16 a 20 columnas, detallados)
+//  SPRITES PIXEL ART (Escala aumentada a 3.8x para mayor detalle)
 // ════════════════════════════════════════════════════════════════
 const SP = {
 
-  // ── ANGGIE (Vista frontal, 14 cols × 16 filas @ 2.5px) ──────
+  // ── ANGGIE ──────────────────────────────────────────────────
   anggie_front: [
-    [  // Frame 0: Quieta
-      "....KKKKKK.....",
-      "...KkKKKKkK....",
-      "..KkPPPPPPkK...",
-      "..KPPpPpPPPK...",
-      "..KGYGYGPPpK...",   // cejas y delineado verde/amarillo
-      "..KPPPPPPpPK...",
-      "..KPpPpPPPPK...",   // nariz
-      "...KpPPPpPK....",
-      "...KOOPPOOOK...",   // collar perlas
-      "..JjJTTTTJjJ...",  // chaqueta + camiseta terracota
-      ".JjJTTTTTTJjJ..",
-      "..JjJTtTTJjJ...",
-      "...BBBBbBBB....",
-      "..BbBBBBBbBB...",
-      "...RRR.RRR.....",
-      "...RRR.RRR....."
-    ],
-    [  // Frame 1: Caminando A
+    [
       "....KKKKKK.....",
       "...KkKKKKkK....",
       "..KkPPPPPPkK...",
@@ -116,11 +69,29 @@ const SP = {
       ".JjJTTTTTTJjJ..",
       "..JjJTtTTJjJ...",
       "...BBBBbBBB....",
-      "..BbBBB.BbBB...",   // pierna levantada
+      "..BbBBBBBbBB...",
+      "...RRR.RRR.....",
+      "...RRR.RRR....."
+    ],
+    [
+      "....KKKKKK.....",
+      "...KkKKKKkK....",
+      "..KkPPPPPPkK...",
+      "..KPPpPpPPPK...",
+      "..KGYGYGPPpK...",
+      "..KPPPPPPpPK...",
+      "..KPpPpPPPPK...",
+      "...KpPPPpPK....",
+      "...KOOPPOOOK...",
+      "..JjJTTTTJjJ...",
+      ".JjJTTTTTTJjJ..",
+      "..JjJTtTTJjJ...",
+      "...BBBBbBBB....",
+      "..BbBBB.BbBB...",
       "...RRR..RRR....",
       "...RR...RRR....."
     ],
-    [  // Frame 2: Caminando B
+    [
       "....KKKKKK.....",
       "...KkKKKKkK....",
       "..KkPPPPPPkK...",
@@ -140,9 +111,8 @@ const SP = {
     ]
   ],
 
-  // ── ANGGIE (Vista lateral, 12 cols × 16 filas) ──────────────
   anggie_side: [
-    [  // Frame 0 lado
+    [
       "...KKKKK......",
       "..KkKKKkKK....",
       "..KkPPPPpK....",
@@ -160,7 +130,7 @@ const SP = {
       "...RRR.RR......",
       "...RRR.RRR....."
     ],
-    [  // Frame 1 lado
+    [
       "...KKKKK......",
       "..KkKKKkKK....",
       "..KkPPPPpK....",
@@ -180,7 +150,6 @@ const SP = {
     ]
   ],
 
-  // ── ANGGIE (Vista trasera, 14 cols × 16 filas) ──────────────
   anggie_back: [
     [
       "....KKKKKK.....",
@@ -189,7 +158,7 @@ const SP = {
       "..KKKKKKKKkK...",
       "..KkKKKKKKkK...",
       "...KKkKKkKK....",
-      "....KKKKkKK....",  // Coleta visible por detrás
+      "....KKKKkKK....",
       "...kKKKKKKK....",
       "..JjJTTTTJjJ...",
       ".JjJTTTTTTJjJ..",
@@ -201,25 +170,25 @@ const SP = {
     ]
   ],
 
-  // ── PÉFAUR (Vista frontal, 14 cols × 14 filas) ──────────────
+  // ── PROFESOR PÉFAUR ─────────────────────────────────────────
   pefaur_front: [
-    [ // Frame 0
-      "...gwggwwgg....",   // cabello gris, entradas
+    [
+      "...gwggwwgg....",
       "..gQQQQQQQgQ...",
       ".gQQqQqQQQqQg..",
-      ".gQLlLlLlLQQg..",  // lentes dorados
-      ".gQLeLeLeLQQg..",  // lentes con cristal
+      ".gQLlLlLlLQQg..",
+      ".gQLeLeLeLQQg..",
       ".gQQLlLlQQQg...",
       "..gQQQQQQQg....",
       "...gQqQQqQg....",
-      "..CcCCCCCcC....",  // camisa azul
+      "..CcCCCCCcC....",
       ".CcCCCCCCCcC...",
       "..CcCcCCcCcC...",
       "...CcCCCcCC....",
       "...BBBbBBBB....",
       "...BBBBbBBB...."
     ],
-    [ // Frame 1 (ligeramente diferente para animación)
+    [
       "...gwggwwgg....",
       "..gQQQQQQQgQ...",
       ".gQQqQqQQQqQg..",
@@ -237,12 +206,12 @@ const SP = {
     ]
   ],
 
-  // ── SERPIENTE BOTHROPS (Cuerpo en S, 14 cols × 10 filas) ─────
+  // ── BOTHROPS ────────────────────────────────────────────────
   snake: [
-    [  // Frame 0
+    [
       "....SsSSSsS...",
       "...SSSsSSSSS..",
-      "..SSXsXsSSS...",   // ojos y cabeza triangular
+      "..SSXsXsSSS...",
       "..SSSxSSSSS...",
       "...SSSSsSSSS..",
       "....SSSSsSSS.",
@@ -251,7 +220,7 @@ const SP = {
       "..sSSSSs.....",
       "...sSSs......"
     ],
-    [  // Frame 1
+    [
       "...SsSSSsS....",
       "..SSSsSSSSS...",
       ".SSXsXsSSS....",
@@ -265,12 +234,12 @@ const SP = {
     ]
   ],
 
-  // ── COFRE CON LINTERNA (encontrado de sorpresa) ───────────────
+  // ── ELEMENTOS DEL ENTORNO ──────────────────────────────────
   chest_closed: [
     "...EAAAAAE...",
     "..EAAAAAAAAE.",
     ".EAAAAAAAAAE.",
-    ".EAAAAALAAAE.",   // candado dorado L
+    ".EAAAAALAAAE.",
     "EAAAAAALAAAE.",
     ".EEEEEEEEEE.",
     "..EEEEEEEE..",
@@ -281,7 +250,7 @@ const SP = {
     "..YAAAAAYY...",
     ".YYAAAAAYYYY.",
     "YYYYAAAAYYYYY",
-    ".YYYYYYYYYYYYY", // destello de apertura
+    ".YYYYYYYYYYYYY",
     "..EEEEEEEE...",
     "..EAEAEAEE...",
     "..EEEEEEEE...",
@@ -289,23 +258,21 @@ const SP = {
     "..EEEEEEEE..."
   ],
 
-  // ── ÁRBOL SELVA NUBLADA (con musgo y bromeliads) ─────────────
   tree: [
     "........MMMM........",
     ".......MmMMMmM......",
-    ".....IMmMMMMmMMI....",   // bromeliada I (rosa-azul)
+    ".....IMmMMMMmMMI....",
     "....IMMmMMMmMMMMI...",
     "...MMMMmMMMmMMMMM...",
     "...MmMMMmMMMmMMMM...",
     "....MMMmMMMmMMMMM...",
     "....FMMmMMMmMMMF....",
-    "......NNNNNNNN......",   // tronco con corteza N
-    ".....NNdNdNNNNN.....",   // musgo en tronco
+    "......NNNNNNNN......",
+    ".....NNdNdNNNNN.....",
     ".....NNNNdNNNNN.....",
     "....NNNNNNNNNNNN...."
   ],
 
-  // ── ARBUSTO SELVA NUBLADA (con orquídea y helechos) ──────────
   bush: [
     "....DDDI...ID...",
     "..DDDdDDDdDdD...",
@@ -317,31 +284,33 @@ const SP = {
     "...DDDdDDD....."
   ],
 
-  // ── LATA XPI (amarilla, brillante) ────────────────────────────
+  rock: [
+    "....rrrr....",
+    "..rrR2R2rr..",
+    ".rR2R2R2R2r.",
+    ".rR2dDdDR2r.",
+    "..rrR2R2rr..",
+    "....rrrr...."
+  ],
+
+  log: [
+    "..NNNNNNNNNN..",
+    ".NdNNNNNNNnNN.",
+    "NNNNNnNNNNNNNN",
+    ".NdNNNNNNNnNN.",
+    "..NNNNNNNNNN.."
+  ],
+
   xpi: [
     "...YYYY...",
     "..YYYYYY..",
-    ".YwYYwYYY.",   // 'w' blanco brillo
+    ".YwYYwYYY.",
     ".YYYYYYYY.",
-    ".YXYXYYYY.",   // 'X' letras Xpi
+    ".YXYXYYYY.",
     ".YYYYYYYY.",
     ".YYYYYYYY.",
     "..YYYYYY..",
     "...YYYY..."
-  ],
-
-  // ── LINTERNA FRONTAL (en el suelo) ───────────────────────────
-  headlamp: [
-    "...AAAAA...",
-    "..AWWWWWA..",
-    ".AWWYYYWWA.",
-    "AWWWYYYYWWA",
-    ".AWWYYYWWA.",
-    "..AWWWWWA..",
-    "...AAAAA...",
-    "...LLLLLL..",   // banda de cabeza
-    "..LLLLLLLL.",
-    "...LLLLLL..."
   ]
 };
 
@@ -353,19 +322,19 @@ const ctx      = canvas.getContext('2d');
 let canvasW    = window.innerWidth;
 let canvasH    = window.innerHeight;
 
-const MAP_W    = 1800;
-const MAP_H    = 1800;
+const MAP_W    = 2000;
+const MAP_H    = 2000;
 
 // Estado del juego
-let gameState  = 'menu';          // menu | playing | paused | gameover
-let storyPhase = 'phase1_day';    // Ver STORY_PHASES
+let gameState  = 'menu';
+let storyPhase = 'phase1_day';
 let score      = 0;
 let pts        = 0;
 let highScore  = parseInt(localStorage.getItem('bothrops_hs')) || 0;
 let caught     = 0;
-let catalog    = [];               // especies únicas capturadas
+let catalog    = [];
 
-// Energía de Anggie (100 → 0 → cansada → Péfaur llega)
+// Energía de Anggie
 let energy     = 100;
 let energyTarget = 100;
 let isTired    = false;
@@ -385,11 +354,12 @@ let pefaurNPC  = null;
 let chestItem  = null;
 let snakes     = [];
 let obstacles  = [];
+let terrainProps = []; // rocas, troncos, hongos, flores
+let pathNodes  = [];  // nodos de camino orgánico de tierra
 let particles  = [];
 let mistClouds = [];
 const camera   = { x:0, y:0 };
 
-// Niebla ambiental en el lienzo
 let tick = 0;
 
 // ════════════════════════════════════════════════════════════════
@@ -405,24 +375,24 @@ let touchInputX    = 0;
 let touchInputY    = 0;
 
 // ════════════════════════════════════════════════════════════════
-//  UTILIDAD: DIBUJAR SPRITE
+//  UTILIDAD: DIBUJAR SPRITE (Escala por defecto 3.8x)
 // ════════════════════════════════════════════════════════════════
-function drawSprite(sprite, wx, wy, scale, flipX=false, colorOverride={}) {
+function drawSprite(sprite, wx, wy, scale = 3.8, flipX = false, colorOverride = {}) {
   const rows = sprite.length;
-  const cols  = sprite[0].length;
+  const cols = sprite[0].length;
 
   ctx.save();
   ctx.translate(wx - camera.x, wy - camera.y);
-  if (flipX) { ctx.scale(-1,1); ctx.translate(-cols*scale, 0); }
+  if (flipX) { ctx.scale(-1, 1); ctx.translate(-cols * scale, 0); }
 
-  for (let r=0; r<rows; r++) {
-    for (let c=0; c<cols; c++) {
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
       const ch = sprite[r][c];
       if (ch === '.') continue;
       const col = colorOverride[ch] || C[ch];
       if (!col) continue;
       ctx.fillStyle = col;
-      ctx.fillRect(c*scale, r*scale, scale+0.5, scale+0.5);
+      ctx.fillRect(c * scale, r * scale, scale + 0.4, scale + 0.4);
     }
   }
   ctx.restore();
@@ -438,7 +408,7 @@ class Particle {
   update() {
     this.x += this.vx; this.y += this.vy;
     if (this.type==='text') { this.vy-=0.05; this.vx*=0.96; }
-    else { this.vy+=0.04; this.vx*=0.98; }  // gravedad suave
+    else { this.vy+=0.03; this.vx*=0.98; }
     this.life--;
   }
   draw() {
@@ -454,43 +424,38 @@ class Particle {
       ctx.strokeText(this.text, sx, sy);
       ctx.fillStyle = this.col;
       ctx.fillText(this.text, sx, sy);
-    } else if (this.type==='ring') {
-      ctx.strokeStyle=this.col; ctx.lineWidth=3;
-      ctx.beginPath();
-      ctx.arc(sx, sy, (1-a)*this.size, 0, Math.PI*2);
-      ctx.stroke();
     }
     ctx.restore();
   }
 }
 
-function burst(x,y,col,count=14,speed=2.2) {
+function burst(x,y,col,count=16,speed=2.5) {
   for (let i=0;i<count;i++) {
     const a=Math.random()*Math.PI*2, sp=Math.random()*speed+0.8;
     particles.push(new Particle(x,y,col,Math.cos(a)*sp,Math.sin(a)*sp,
-      Math.floor(Math.random()*20+20), Math.random()>0.5?4:3));
+      Math.floor(Math.random()*20+20), Math.random()>0.5?5:4));
   }
 }
 
 function floatText(x,y,text,col='#fff') {
-  const p = new Particle(x,y-20,col,0,-1.2,55,0,'text');
+  const p = new Particle(x,y-25,col,0,-1.2,55,0,'text');
   p.text = text;
   particles.push(p);
 }
 
 // ════════════════════════════════════════════════════════════════
-//  NUBES DE NIEBLA AMBIENTAL EN EL MAPA
+//  NIEBLA AMBIENTAL
 // ════════════════════════════════════════════════════════════════
 class MistCloud {
   constructor() { this.reset(true); }
   reset(init=false) {
     this.x    = Math.random()*MAP_W;
     this.y    = init ? Math.random()*MAP_H : (Math.random()>0.5 ? -60 : MAP_H+60);
-    this.w    = Math.random()*200+120;
-    this.h    = Math.random()*35+20;
+    this.w    = Math.random()*220+140;
+    this.h    = Math.random()*40+25;
     this.vx   = (Math.random()-0.5)*0.3;
     this.vy   = (Math.random()-0.5)*0.15;
-    this.alpha= Math.random()*0.18+0.06;
+    this.alpha= Math.random()*0.16+0.06;
     this.life = Math.random()*600+300;
   }
   update() {
@@ -510,44 +475,76 @@ class MistCloud {
 }
 
 // ════════════════════════════════════════════════════════════════
-//  ENTIDADES OBSTÁCULOS
+//  ENTIDADES Y ELEMENTOS DEL TERRENO
 // ════════════════════════════════════════════════════════════════
 class Obstacle {
   constructor(x,y,type) {
     this.x=x; this.y=y; this.type=type;
-    this.radius = type==='tree' ? 16 : 0;
+    this.radius = type==='tree' ? 24 : 0;
   }
   draw() {
     if (this.type==='tree')
-      drawSprite(SP.tree, this.x-25, this.y-30*2.2, 2.2);
+      drawSprite(SP.tree, this.x-36, this.y-45*3.8, 3.8);
     else
-      drawSprite(SP.bush, this.x-20, this.y-20, 2.0);
+      drawSprite(SP.bush, this.x-28, this.y-28, 3.5);
+  }
+}
+
+class TerrainProp {
+  constructor(x,y,type) {
+    this.x=x; this.y=y; this.type=type; // rock, log, flower, mushroom
+  }
+  draw() {
+    if (this.type==='rock') {
+      drawSprite(SP.rock, this.x-20, this.y-16, 3.2);
+    } else if (this.type==='log') {
+      drawSprite(SP.log, this.x-24, this.y-14, 3.2);
+    } else if (this.type==='mushroom') {
+      const sx=this.x-camera.x, sy=this.y-camera.y;
+      ctx.save();
+      ctx.fillStyle='#e63946';
+      ctx.beginPath(); ctx.arc(sx,sy,6,0,Math.PI,true); ctx.fill();
+      ctx.fillStyle='#fff';
+      ctx.fillRect(sx-2,sy,4,6);
+      ctx.fillRect(sx-3,sy-4,2,2); ctx.fillRect(sx+1,sy-5,2,2);
+      ctx.restore();
+    } else if (this.type==='flower') {
+      const sx=this.x-camera.x, sy=this.y-camera.y;
+      ctx.save();
+      ctx.fillStyle='#ffb703';
+      ctx.beginPath(); ctx.arc(sx,sy,4,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#ff006e';
+      ctx.beginPath(); ctx.arc(sx-3,sy,3,0,Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(sx+3,sy,3,0,Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(sx,sy-3,3,0,Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(sx,sy+3,3,0,Math.PI*2); ctx.fill();
+      ctx.restore();
+    }
   }
 }
 
 // ════════════════════════════════════════════════════════════════
-//  PÉFAUR NPC
+//  PROFESOR PÉFAUR NPC
 // ════════════════════════════════════════════════════════════════
 class PefaurNPC {
-  constructor(x,y) { this.x=x; this.y=y; this.radius=20; this.hasXpi=true; this.frame=0; this.animT=0; }
+  constructor(x,y) { this.x=x; this.y=y; this.radius=26; this.hasXpi=true; this.frame=0; this.animT=0; }
   update() { this.animT+=0.06; this.frame=Math.floor(this.animT)%2; }
   draw() {
-    drawSprite(SP.pefaur_front[this.frame], this.x-17, this.y-35, 2.5);
+    drawSprite(SP.pefaur_front[this.frame], this.x-26, this.y-48, 3.8);
     if (this.hasXpi) {
-      const fy = Math.sin(tick*0.08)*3;
-      drawSprite(SP.xpi, this.x+22, this.y-28+fy, 2.0);
-      // Indicador de interacción
-      const r=22+Math.sin(tick*0.1)*4;
+      const fy = Math.sin(tick*0.08)*4;
+      drawSprite(SP.xpi, this.x+32, this.y-36+fy, 3.0);
+      const r=28+Math.sin(tick*0.1)*5;
       ctx.save();
-      ctx.strokeStyle=`rgba(255,234,0,${0.5+0.4*Math.sin(tick*0.1)})`;
-      ctx.lineWidth=2;
+      ctx.strokeStyle=`rgba(255,234,0,${0.6+0.4*Math.sin(tick*0.1)})`;
+      ctx.lineWidth=3;
       ctx.beginPath();
-      ctx.arc(this.x-camera.x, this.y-camera.y-40, r, 0, Math.PI*2);
+      ctx.arc(this.x-camera.x, this.y-camera.y-55, r, 0, Math.PI*2);
       ctx.stroke();
-      ctx.fillStyle='rgba(255,234,0,0.9)';
-      ctx.font='14px sans-serif';
+      ctx.fillStyle='rgba(255,234,0,0.95)';
+      ctx.font='bold 18px sans-serif';
       ctx.textAlign='center';
-      ctx.fillText('!', this.x-camera.x, this.y-camera.y-34);
+      ctx.fillText('!', this.x-camera.x, this.y-camera.y-48);
       ctx.restore();
     }
   }
@@ -557,25 +554,24 @@ class PefaurNPC {
 //  COFRE / LINTERNA (SORPRESA)
 // ════════════════════════════════════════════════════════════════
 class ChestItem {
-  constructor(x,y) { this.x=x; this.y=y; this.radius=22; this.isOpen=false; this.glowT=0; }
+  constructor(x,y) { this.x=x; this.y=y; this.radius=30; this.isOpen=false; this.glowT=0; }
   update() { this.glowT+=0.07; }
   draw() {
     const sprite = this.isOpen ? SP.chest_open : SP.chest_closed;
-    drawSprite(sprite, this.x-14, this.y-22, 2.2);
+    drawSprite(sprite, this.x-22, this.y-32, 3.5);
 
     if (!this.isOpen) {
-      // Haz de luz dorada hacia arriba
       const sx=this.x-camera.x, sy=this.y-camera.y;
       ctx.save();
-      const grad = ctx.createLinearGradient(sx,sy,sx,sy-90);
-      grad.addColorStop(0, `rgba(255,220,50,${0.25+0.12*Math.sin(this.glowT)})`);
+      const grad = ctx.createLinearGradient(sx,sy,sx,sy-120);
+      grad.addColorStop(0, `rgba(255,220,50,${0.35+0.15*Math.sin(this.glowT)})`);
       grad.addColorStop(1, 'rgba(255,220,50,0)');
       ctx.fillStyle=grad;
       ctx.beginPath();
-      ctx.moveTo(sx-12, sy);
-      ctx.lineTo(sx+12, sy);
-      ctx.lineTo(sx+22, sy-90);
-      ctx.lineTo(sx-22, sy-90);
+      ctx.moveTo(sx-18, sy);
+      ctx.lineTo(sx+18, sy);
+      ctx.lineTo(sx+35, sy-120);
+      ctx.lineTo(sx-35, sy-120);
       ctx.fill();
       ctx.restore();
     }
@@ -583,11 +579,11 @@ class ChestItem {
 }
 
 // ════════════════════════════════════════════════════════════════
-//  SERPIENTE BOTHROPS
+//  SERPIENTE BOTHROPS (Slower speeds)
 // ════════════════════════════════════════════════════════════════
 class BothropsSnake {
   constructor(x,y,species) {
-    this.x=x; this.y=y; this.species=species; this.radius=16;
+    this.x=x; this.y=y; this.species=species; this.radius=22;
     this.speed=species.speed; this.frame=0; this.animT=0; this.flipX=false;
     const a=Math.random()*Math.PI*2;
     this.vx=Math.cos(a)*this.speed; this.vy=Math.sin(a)*this.speed;
@@ -595,40 +591,36 @@ class BothropsSnake {
     this.tongueOut=false; this.tongueT=0;
   }
   update() {
-    this.animT+=0.1; this.frame=Math.floor(this.animT)%2;
+    this.animT+=0.08; this.frame=Math.floor(this.animT)%2;
     this.stateT--; this.tongueT++;
 
-    // Lengua viperina
-    if (this.tongueT%90===0) { this.tongueOut=true; setTimeout(()=>{ this.tongueOut=false; },300); }
+    if (this.tongueT%80===0) { this.tongueOut=true; setTimeout(()=>{ this.tongueOut=false; },350); }
 
-    // Cambio de dirección suave
     if (this.stateT<=0) {
       const a=Math.random()*Math.PI*2;
       this.vx=Math.cos(a)*this.speed; this.vy=Math.sin(a)*this.speed;
-      this.stateT=Math.floor(Math.random()*120+60);
+      this.stateT=Math.floor(Math.random()*140+70);
     }
 
     this.x+=this.vx; this.y+=this.vy;
-    if (this.x<50||this.x>MAP_W-50) this.vx*=-1;
-    if (this.y<50||this.y>MAP_H-50) this.vy*=-1;
-    this.x=Math.max(50,Math.min(MAP_W-50,this.x));
-    this.y=Math.max(50,Math.min(MAP_H-50,this.y));
+    if (this.x<60||this.x>MAP_W-60) this.vx*=-1;
+    if (this.y<60||this.y>MAP_H-60) this.vy*=-1;
+    this.x=Math.max(60,Math.min(MAP_W-60,this.x));
+    this.y=Math.max(60,Math.min(MAP_H-60,this.y));
     this.flipX=this.vx<0;
   }
   draw() {
-    // Sobreescribir colores de escama con los de la especie
     const oc={ 'S':this.species.color, 's':this.species.bodyColor };
-    drawSprite(SP.snake[this.frame], this.x-18, this.y-14, 2.2, this.flipX, oc);
+    drawSprite(SP.snake[this.frame], this.x-26, this.y-20, 3.6, this.flipX, oc);
 
-    // Lengua bífida
     if (this.tongueOut) {
-      const sx=this.x-camera.x, sy=this.y-camera.y-4;
+      const sx=this.x-camera.x, sy=this.y-camera.y-5;
       const dir=this.flipX?-1:1;
       ctx.save();
-      ctx.strokeStyle='#ff4444'; ctx.lineWidth=1.5;
-      ctx.beginPath(); ctx.moveTo(sx,sy); ctx.lineTo(sx+dir*14,sy);
-      ctx.moveTo(sx+dir*14,sy); ctx.lineTo(sx+dir*20,sy-4);
-      ctx.moveTo(sx+dir*14,sy); ctx.lineTo(sx+dir*20,sy+4);
+      ctx.strokeStyle='#ff3333'; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.moveTo(sx,sy); ctx.lineTo(sx+dir*18,sy);
+      ctx.moveTo(sx+dir*18,sy); ctx.lineTo(sx+dir*26,sy-5);
+      ctx.moveTo(sx+dir*18,sy); ctx.lineTo(sx+dir*26,sy+5);
       ctx.stroke();
       ctx.restore();
     }
@@ -640,12 +632,12 @@ class BothropsSnake {
 // ════════════════════════════════════════════════════════════════
 class AnggiePlayer {
   constructor(x,y) {
-    this.x=x; this.y=y; this.radius=15;
-    this.baseSpeed=3.2; this.speed=this.baseSpeed;
+    this.x=x; this.y=y; this.radius=20;
+    this.baseSpeed=3.4; this.speed=this.baseSpeed;
     this.dir='front'; this.flipX=false;
     this.frame=0; this.walkT=0; this.isMoving=false;
     this.xpiBoostT=0;
-    this.catchRadius=28;
+    this.catchRadius=38;
     this.stepSound=0;
   }
   update() {
@@ -662,32 +654,28 @@ class AnggiePlayer {
       if (dx!==0&&dy!==0) { const l=Math.hypot(dx,dy); dx/=l; dy/=l; }
     }
 
-    // Velocidad
     if (isTired) {
-      this.speed=1.3;
+      this.speed=1.4;
     } else if (this.xpiBoostT>0) {
       this.xpiBoostT--;
-      this.speed=4.8;
-      if (Math.random()<0.25) {
-        particles.push(new Particle(this.x+(Math.random()-0.5)*14, this.y+4,
-          '#ffea00',-dx*1.5,-dy*1.5,14,3));
+      this.speed=5.2;
+      if (Math.random()<0.3) {
+        particles.push(new Particle(this.x+(Math.random()-0.5)*18, this.y+6,
+          '#ffea00',-dx*1.8,-dy*1.8,16,4));
       }
     } else {
       this.speed=this.baseSpeed;
     }
 
-    // Efecto de cansancio (sudor)
-    if (isTired && Math.random()<0.08) {
-      particles.push(new Particle(this.x+(Math.random()-0.5)*12, this.y-28,
-        '#64b5f6', 0, 0.6, 22, 3));
+    if (isTired && Math.random()<0.1) {
+      particles.push(new Particle(this.x+(Math.random()-0.5)*16, this.y-38,
+        '#64b5f6', 0, 0.8, 24, 4));
     }
 
     if (dx!==0||dy!==0) {
       this.isMoving=true;
-      const px=this.x, py=this.y;
       this.x+=dx*this.speed; this.y+=dy*this.speed;
 
-      // Determinar sprite
       if (Math.abs(dx)>0.4) { this.dir='side'; this.flipX=dx<0; }
       else { this.dir = dy>0?'front':'back'; this.flipX=false; }
 
@@ -695,13 +683,11 @@ class AnggiePlayer {
       this.frame=(Math.floor(this.walkT)%2)+1;
       this.stepSound++;
 
-      // Sonido de pasos
-      if (this.stepSound%22===0) audio.playStep();
+      if (this.stepSound%20===0) audio.playStep();
 
-      this.x=Math.max(35,Math.min(MAP_W-35,this.x));
-      this.y=Math.max(35,Math.min(MAP_H-35,this.y));
+      this.x=Math.max(40,Math.min(MAP_W-40,this.x));
+      this.y=Math.max(40,Math.min(MAP_H-40,this.y));
 
-      // Colisión con árboles
       for (const ob of obstacles) {
         if (ob.type!=='tree') continue;
         const dx2=this.x-ob.x, dy2=this.y-ob.y;
@@ -716,10 +702,9 @@ class AnggiePlayer {
       this.frame=0;
     }
 
-    // Partículas de pisadas en musgo/niebla
-    if (this.isMoving && Math.random()<0.06) {
-      particles.push(new Particle(this.x, this.y+8,'#4a7c50',
-        (Math.random()-0.5)*0.5, -Math.random()*0.3, 18, 3));
+    if (this.isMoving && Math.random()<0.08) {
+      particles.push(new Particle(this.x, this.y+12,'#4a7c50',
+        (Math.random()-0.5)*0.6, -Math.random()*0.4, 20, 3));
     }
   }
 
@@ -729,16 +714,15 @@ class AnggiePlayer {
     else if (this.dir==='back') sprite=SP.anggie_back[0];
     else sprite=SP.anggie_front[this.frame];
 
-    drawSprite(sprite, this.x-17, this.y-40, 2.5, this.flipX);
+    drawSprite(sprite, this.x-26, this.y-58, 3.8, this.flipX);
 
-    // Aura de boost Xpi
     if (this.xpiBoostT>0) {
       ctx.save();
-      const a=0.3+0.2*Math.sin(tick*0.2);
+      const a=0.35+0.2*Math.sin(tick*0.2);
       ctx.strokeStyle=`rgba(255,234,0,${a})`;
-      ctx.lineWidth=3;
+      ctx.lineWidth=4;
       ctx.beginPath();
-      ctx.ellipse(this.x-camera.x, this.y-camera.y-5, 22, 28, 0, 0, Math.PI*2);
+      ctx.ellipse(this.x-camera.x, this.y-camera.y-10, 32, 40, 0, 0, Math.PI*2);
       ctx.stroke();
       ctx.restore();
     }
@@ -746,37 +730,70 @@ class AnggiePlayer {
 }
 
 // ════════════════════════════════════════════════════════════════
-//  GENERACIÓN DEL MAPA (SELVA NUBLADA)
+//  GENERACIÓN DEL TERRENO DETALLADO Y CAMINOS ORGÁNICOS
 // ════════════════════════════════════════════════════════════════
 function generateMap() {
-  obstacles=[]; snakes=[]; particles=[]; mistClouds=[];
+  obstacles=[]; terrainProps=[]; snakes=[]; particles=[]; mistClouds=[]; pathNodes=[];
   chestItem=null; pefaurNPC=null;
 
-  // Árboles
+  // Generar red de caminos de tierra orgánicos (inspirados en referencia.png)
+  const mainWaypoints = [
+    {x: MAP_W*0.2, y: MAP_H*0.2},
+    {x: MAP_W*0.5, y: MAP_H*0.3},
+    {x: MAP_W*0.8, y: MAP_H*0.25},
+    {x: MAP_W*0.3, y: MAP_H*0.6},
+    {x: MAP_W*0.5, y: MAP_H*0.5},
+    {x: MAP_W*0.7, y: MAP_H*0.75},
+    {x: MAP_W*0.2, y: MAP_H*0.85},
+    {x: MAP_W*0.8, y: MAP_H*0.85}
+  ];
+
+  // Interpolar puntos a lo largo de caminos curvados
+  for (let i = 0; i < mainWaypoints.length - 1; i++) {
+    const p1 = mainWaypoints[i];
+    const p2 = mainWaypoints[i+1];
+    const steps = 25;
+    for (let t = 0; t <= steps; t++) {
+      const ratio = t / steps;
+      const nx = p1.x + (p2.x - p1.x) * ratio + Math.sin(ratio * Math.PI * 3) * 40;
+      const ny = p1.y + (p2.y - p1.y) * ratio + Math.cos(ratio * Math.PI * 2) * 40;
+      pathNodes.push({x: nx, y: ny, r: Math.random()*25 + 35});
+    }
+  }
+
+  // Árboles con musgo y raíces
   let tries=0;
-  while (obstacles.filter(o=>o.type==='tree').length<40&&tries<400) {
-    const rx=Math.random()*(MAP_W-200)+100, ry=Math.random()*(MAP_H-200)+100;
-    if (Math.hypot(rx-MAP_W/2, ry-MAP_H/2)>140) {
-      if (!obstacles.some(o=>Math.hypot(o.x-rx,o.y-ry)<70)) {
+  while (obstacles.filter(o=>o.type==='tree').length<45 && tries<500) {
+    const rx=Math.random()*(MAP_W-220)+110, ry=Math.random()*(MAP_H-220)+110;
+    if (Math.hypot(rx-MAP_W/2, ry-MAP_H/2)>160) {
+      if (!obstacles.some(o=>Math.hypot(o.x-rx,o.y-ry)<80)) {
         obstacles.push(new Obstacle(rx,ry,'tree'));
       }
     }
     tries++;
   }
 
-  // Arbustos (con orquídeas)
-  for (let i=0;i<30;i++) {
+  // Arbustos
+  for (let i=0; i<35; i++) {
     obstacles.push(new Obstacle(
-      Math.random()*(MAP_W-180)+90,
-      Math.random()*(MAP_H-180)+90,
+      Math.random()*(MAP_W-200)+100,
+      Math.random()*(MAP_H-200)+100,
       'bush'
     ));
   }
 
-  // Nubes de niebla
-  for (let i=0;i<16;i++) mistClouds.push(new MistCloud());
+  // Rocas, troncos caídos, hongos y flores
+  for (let i=0; i<25; i++) {
+    terrainProps.push(new TerrainProp(Math.random()*(MAP_W-200)+100, Math.random()*(MAP_H-200)+100, 'rock'));
+    terrainProps.push(new TerrainProp(Math.random()*(MAP_W-200)+100, Math.random()*(MAP_H-200)+100, 'log'));
+    terrainProps.push(new TerrainProp(Math.random()*(MAP_W-200)+100, Math.random()*(MAP_H-200)+100, 'mushroom'));
+    terrainProps.push(new TerrainProp(Math.random()*(MAP_W-200)+100, Math.random()*(MAP_H-200)+100, 'flower'));
+  }
 
-  // Serpientes iniciales (diurnas)
+  // Nubes de niebla
+  for (let i=0;i<18;i++) mistClouds.push(new MistCloud());
+
+  // Serpientes diurnas iniciales
   spawnSnakes(false, 5);
 }
 
@@ -785,10 +802,10 @@ function spawnSnakes(nocturnal, count) {
   for (let i=0;i<count;i++) {
     const sp=pool[Math.floor(Math.random()*pool.length)];
     let rx,ry,ok=false, att=0;
-    while (!ok&&att<50) {
-      rx=Math.random()*(MAP_W-200)+100; ry=Math.random()*(MAP_H-200)+100;
-      const nearTree=obstacles.some(o=>o.type==='tree'&&Math.hypot(o.x-rx,o.y-ry)<50);
-      const nearPlayer=player&&Math.hypot(player.x-rx,player.y-ry)<220;
+    while (!ok&&att<60) {
+      rx=Math.random()*(MAP_W-240)+120; ry=Math.random()*(MAP_H-240)+120;
+      const nearTree=obstacles.some(o=>o.type==='tree'&&Math.hypot(o.x-rx,o.y-ry)<60);
+      const nearPlayer=player&&Math.hypot(player.x-rx,player.y-ry)<250;
       if (!nearTree&&!nearPlayer) ok=true;
       att++;
     }
@@ -797,40 +814,40 @@ function spawnSnakes(nocturnal, count) {
 }
 
 // ════════════════════════════════════════════════════════════════
-//  SISTEMA NARRATIVO: DIÁLOGOS
+//  SISTEMA NARRATIVO: DIÁLOGOS (Profesor Péfaur)
 // ════════════════════════════════════════════════════════════════
 const STORY = {
   pefaur_arrives: [
-    { who:'Péfaur', img:'assets/pefaur_portrait.jpg',
-      text:'¡Anggie! Te ves agotada... ¡has estado buscando Bothrops sin parar!' },
+    { who:'Profesor Péfaur', img:'assets/pefaur_portrait.jpg',
+      text:'¡Anggie! Te ves agotada... ¡has estado buscando Bothrops sin parar por toda la selva!' },
     { who:'Anggie', img:'assets/anggie_portrait.jpg',
-      text:'Péfaur... sí, ya no puedo más. ¡Pero hay tantas especies que registrar!' },
-    { who:'Péfaur', img:'assets/pefaur_portrait.jpg',
+      text:'Profesor Péfaur... sí, ya no puedo más... ¡pero hay tantas especies que registrar!' },
+    { who:'Profesor Péfaur', img:'assets/pefaur_portrait.jpg',
       text:'Toma esta Xpi bien helada. ¡Recarga energías y continuamos el muestreo!' },
     { who:'Anggie', img:'assets/anggie_portrait.jpg',
-      text:'¡Ah, perfecta! ¡Ya me siento como nueva! ¡Sigamos buscando Bothrops!' },
+      text:'¡Muchas gracias, Profesor! Esta Xpi helada es justo lo que necesitaba.' },
   ],
   night_falling: [
     { who:'Anggie', img:'assets/anggie_portrait.jpg',
       text:'¡Vaya... está anocheciendo! Las especies nocturnas van a salir ahora.' },
-    { who:'Péfaur', img:'assets/pefaur_portrait.jpg',
-      text:'¡Exacto, Anggie! Las Bothrops bilineatus y taeniatus son más activas de noche.' },
+    { who:'Profesor Péfaur', img:'assets/pefaur_portrait.jpg',
+      text:'¡Exacto, Anggie! Las Bothrops bilineatus y taeniatus son más activas en la oscuridad.' },
   ],
   found_headlamp: [
     { who:'Anggie', img:'assets/anggie_portrait.jpg',
-      text:'¡Oh! ¡Hay algo en el suelo...! ¡Es una linterna frontal! ¡Qué suerte!' },
+      text:'¡Oh! ¡Hay algo brillando entre la vegetación! ¡Es una linterna frontal! ¡Qué suerte!' },
     { who:'Anggie', img:'assets/anggie_portrait.jpg',
-      text:'¡Con esto puedo seguir buscando Bothrops nocturnas! ¡Vamos!' },
+      text:'¡Con esto puedo seguir buscando Bothrops nocturnas en la oscuridad! ¡Vamos!' },
   ],
   victory: [
-    { who:'Péfaur', img:'assets/pefaur_portrait.jpg',
+    { who:'Profesor Péfaur', img:'assets/pefaur_portrait.jpg',
       text:'¡Extraordinario trabajo, Anggie! Hemos completado el muestreo de campo.' },
-    { who:'Péfaur', img:'assets/pefaur_portrait.jpg',
+    { who:'Profesor Péfaur', img:'assets/pefaur_portrait.jpg',
       text:'Ya tenemos especímenes de varias especies del género Bothrops. ¡Material invaluable!' },
     { who:'Anggie', img:'assets/anggie_portrait.jpg',
-      text:'¡Sí, Péfaur! Entre la colección diurna y nocturna tenemos datos excepcionales.' },
+      text:'¡Sí, Profesor Péfaur! Entre la colección diurna y nocturna tenemos datos excepcionales.' },
     { who:'Anggie', img:'assets/anggie_portrait.jpg',
-      text:'¡Esta investigación en la Selva Nublada venezolana va a ser histórica! ¡Volvamos al lab!' },
+      text:'¡Esta investigación en la Selva Nublada venezolana va a ser histórica! ¡Volvamos al laboratorio!' },
   ],
 };
 
@@ -855,7 +872,6 @@ function nextDialogStep() {
   document.getElementById('dialog-portrait-name').textContent = step.who;
   document.getElementById('dialog-portrait-img').src = step.img;
 
-  // Typewriter animado
   clearInterval(dialogTypewriterInterval);
   dialogFull  = step.text;
   dialogTyped = '';
@@ -870,7 +886,6 @@ function nextDialogStep() {
 }
 
 document.getElementById('btn-dialog-next').addEventListener('click', ()=>{
-  // Si typewriter no ha terminado, mostrarlo todo inmediatamente
   if (dialogTyped.length<dialogFull.length) {
     clearInterval(dialogTypewriterInterval);
     dialogTyped=dialogFull;
@@ -924,38 +939,30 @@ function catchSnake(snake, idx) {
   audio.playCatch();
   if (navigator.vibrate) navigator.vibrate(45);
 
-  // Reducir energía al capturar
   energyTarget = Math.max(0, energyTarget-12);
   updateEnergyBar();
 
-  // Panel de captura
   showCatchPanel(snake.species);
 
-  // Partículas
-  burst(snake.x, snake.y, snake.species.color, 18, 2.5);
-  floatText(snake.x, snake.y, '+'+snake.species.pts+' pts',
-    caught>1?'#a8e063':'#fff');
+  burst(snake.x, snake.y, snake.species.color, 20, 2.8);
+  floatText(snake.x, snake.y, '+'+snake.species.pts+' pts', caught>1?'#a8e063':'#fff');
 
   if (!catalog.some(s=>s.id===snake.species.id)) catalog.push(snake.species);
 
   // ── PROGRESIÓN NARRATIVA ──────────────────────────────────────
-  // FASE 1: 4 serpientes → se cansa → Péfaur llega
   if (storyPhase==='phase1_day' && caught>=4) {
     storyPhase='cutscene_tired';
     isTired=true; energyTarget=8; updateEnergyBar();
     setTimeout(()=>{
-      pefaurNPC = new PefaurNPC(player.x+130, player.y-40);
-      setPhaseUI('🥤','PÉFAUR HA LLEGADO',
-        'Habla con Péfaur para recuperar energías',1);
+      pefaurNPC = new PefaurNPC(player.x+150, player.y-40);
+      setPhaseUI('🥤','EL PROFESOR PÉFAUR HA LLEGADO',
+        'Habla con el Profesor Péfaur para recuperar energías',1);
     }, 1400);
   }
-
-  // FASE 2 (tras Xpi): 3 serpientes más (7 total) → anochece
   else if (storyPhase==='phase2_afternoon' && caught>=7) {
     storyPhase='phase3_dusk';
-    setPhaseUI('🌙','ATARDECER','¡Explora la selva al anochecer!', 3);
+    setPhaseUI('🌙','ATARDECER EN LA SELVA','¡Explora la selva al anochecer!', 3);
 
-    // Anochecer progresivo
     nightTarget=0.75;
     audio.playNightTransition();
 
@@ -966,29 +973,24 @@ function catchSnake(snake, idx) {
       });
     }, 2500);
   }
-
-  // FASE 3: de noche, de repente aparece la linterna en el camino de Anggie
   else if (storyPhase==='phase3_night' && caught>=10) {
     storyPhase='phase4_lamp_spawn';
-    // La linterna aparece cerca de Anggie (sorpresa)
-    chestItem = new ChestItem(player.x + (Math.random()>0.5?1:-1)*90,
-                               player.y + (Math.random()>0.5?1:-1)*60);
-    setPhaseUI('🔦','¡ALGO BRILLA ENTRE LOS HELECHOS!',
+    // Linterna aparece de sorpresa cerca de Anggie
+    chestItem = new ChestItem(player.x + (Math.random()>0.5?1:-1)*110,
+                               player.y + (Math.random()>0.5?1:-1)*80);
+    setPhaseUI('🔦','¡ALGO BRILLA ENTRE LA VEGETACIÓN!',
       'Anggie nota un destello en el suelo...', 0);
-    burst(chestItem.x, chestItem.y, '#ffea00', 20, 1.5);
-    floatText(chestItem.x, chestItem.y-10, '???', '#ffea00');
+    burst(chestItem.x, chestItem.y, '#ffea00', 24, 2.0);
+    floatText(chestItem.x, chestItem.y-10, '¡Linterna sorpresa!', '#ffea00');
   }
-
-  // FASE 4 nocturna: 4 serpientes más con linterna (14 total) → Péfaur finaliza
   else if (storyPhase==='phase4_night_lamp' && caught>=14) {
     storyPhase='cutscene_victory';
-    pefaurNPC = new PefaurNPC(player.x+110, player.y-30);
+    pefaurNPC = new PefaurNPC(player.x+130, player.y-30);
     setPhaseUI('🏁','¡MUESTREO COMPLETADO!',
-      'Habla con Péfaur para finalizar la expedición', 0);
+      'Habla con el Profesor Péfaur para finalizar la expedición', 0);
   }
 }
 
-// Panel de especie capturada (con foto serpiente)
 let catchPanelTimer=null;
 function showCatchPanel(sp) {
   document.getElementById('catch-species-name').textContent = sp.name;
@@ -997,46 +999,42 @@ function showCatchPanel(sp) {
   const panel = document.getElementById('catch-panel');
   panel.classList.remove('hidden');
   clearTimeout(catchPanelTimer);
-  catchPanelTimer=setTimeout(()=>panel.classList.add('hidden'), 3000);
+  catchPanelTimer=setTimeout(()=>panel.classList.add('hidden'), 3200);
 }
 
 // ════════════════════════════════════════════════════════════════
-//  BUCLE PRINCIPAL: UPDATE
+//  BUCLE PRINCIPAL: UPDATE Y CÁMARA CENTRADA
 // ════════════════════════════════════════════════════════════════
 function updateGame() {
   if (gameState!=='playing') return;
   tick++;
 
-  // Transición de noche suave
   nightAlpha += (nightTarget - nightAlpha)*0.008;
-
-  // Actualizar energía
   energy += (energyTarget - energy)*0.05;
 
-  // Player
+  // Player update
   player.update();
 
-  // Cámara suave
-  camera.x += (player.x - canvasW/2 - camera.x)*0.1;
-  camera.y += (player.y - canvasH/2 - camera.y)*0.1;
-  camera.x = Math.max(0, Math.min(MAP_W-canvasW, camera.x));
-  camera.y = Math.max(0, Math.min(MAP_H-canvasH, camera.y));
+  // CÁMARA CENTRADA DE FORMA EXACTA Y SUAVE
+  const targetCamX = player.x - canvasW / 2;
+  const targetCamY = player.y - canvasH / 2;
 
-  // Niebla
+  camera.x += (targetCamX - camera.x) * 0.15;
+  camera.y += (targetCamY - camera.y) * 0.15;
+
+  camera.x = Math.max(0, Math.min(MAP_W - canvasW, camera.x));
+  camera.y = Math.max(0, Math.min(MAP_H - canvasH, camera.y));
+
   for (const m of mistClouds) m.update();
 
-  // Péfaur NPC
   if (pefaurNPC) {
     pefaurNPC.update();
-
-    // Interacción con Péfaur (Xpi)
-    if (storyPhase==='cutscene_tired' &&
-        Math.hypot(player.x-pefaurNPC.x, player.y-pefaurNPC.y)<50) {
+    if (storyPhase==='cutscene_tired' && Math.hypot(player.x-pefaurNPC.x, player.y-pefaurNPC.y)<60) {
       storyPhase='dialog_pefaur1';
       showDialog('pefaur_arrives', ()=>{
         pefaurNPC.hasXpi=false;
         isTired=false; energyTarget=100; updateEnergyBar();
-        player.xpiBoostT=480;
+        player.xpiBoostT=500;
         audio.playXpiDrink();
         storyPhase='phase2_afternoon';
         setPhaseUI('🌤️','FASE 2: TARDECER',
@@ -1045,9 +1043,7 @@ function updateGame() {
       });
     }
 
-    // Interacción con Péfaur (Victoria)
-    if (storyPhase==='cutscene_victory' &&
-        Math.hypot(player.x-pefaurNPC.x, player.y-pefaurNPC.y)<50) {
+    if (storyPhase==='cutscene_victory' && Math.hypot(player.x-pefaurNPC.x, player.y-pefaurNPC.y)<60) {
       storyPhase='dialog_victory';
       showDialog('victory', ()=>{
         finishVictory();
@@ -1055,10 +1051,9 @@ function updateGame() {
     }
   }
 
-  // Cofre / Linterna (el jugador lo encuentra andando cerca)
   if (chestItem && !chestItem.isOpen) {
     chestItem.update();
-    if (Math.hypot(player.x-chestItem.x, player.y-chestItem.y)<50) {
+    if (Math.hypot(player.x-chestItem.x, player.y-chestItem.y)<60) {
       chestItem.isOpen=true;
       hasHeadlamp=true;
       audio.playChestOpen();
@@ -1072,22 +1067,18 @@ function updateGame() {
     }
   }
 
-  // Serpientes
-  if (gameState!=='playing') return;
   for (let i=snakes.length-1;i>=0;i--) {
     snakes[i].update();
     if (Math.hypot(player.x-snakes[i].x, player.y-snakes[i].y)<player.catchRadius) {
       catchSnake(snakes[i],i);
-      break; // Una por tick para evitar bugs
+      break;
     }
   }
 
-  // Restock de serpientes
   if (snakes.length<5 && Math.random()<0.012) {
     spawnSnakes(storyPhase.includes('night')||storyPhase.includes('lamp'), 1);
   }
 
-  // Partículas
   for (let i=particles.length-1;i>=0;i--) {
     particles[i].update();
     if (particles[i].life<=0) particles.splice(i,1);
@@ -1095,52 +1086,59 @@ function updateGame() {
 }
 
 // ════════════════════════════════════════════════════════════════
-//  RENDERIZADO
+//  RENDERIZADO DEL TERRENO DETALLADO (INSPIRADO EN REFERENCIA.PNG)
 // ════════════════════════════════════════════════════════════════
 function drawMap() {
-  // Fondo base: verde selva nublada
-  ctx.fillStyle='#0f2416';
+  ctx.fillStyle='#1b4332';
   ctx.fillRect(0,0,canvasW,canvasH);
 
   ctx.save();
   ctx.translate(-camera.x, -camera.y);
 
-  // Suelo con textura
-  ctx.fillStyle='#132b18';
+  // 1. Capa de hierba base de 16-bit
+  ctx.fillStyle='#2d6a4f';
   ctx.fillRect(0,0,MAP_W,MAP_H);
 
-  // Patrón de pasto
-  for (let gx=0;gx<MAP_W;gx+=32) {
-    for (let gy=0;gy<MAP_H;gy+=32) {
-      const shade = ((gx/32+gy/32)%2===0) ? '#142e19' : '#163420';
-      ctx.fillStyle=shade;
-      ctx.fillRect(gx,gy,32,32);
+  // Patrón de parches de césped orgánicos duales
+  for (let gx=0; gx<MAP_W; gx+=64) {
+    for (let gy=0; gy<MAP_H; gy+=64) {
+      if (((gx/64 + gy/64) % 2 === 0)) {
+        ctx.fillStyle='#40916c';
+        ctx.fillRect(gx, gy, 64, 64);
+      }
     }
   }
 
-  // Flores de selva nublada
-  const flowers=[
-    {c:'#c0587e',s:4},{c:'#e8b624',s:3},{c:'#80cce8',s:3}
-  ];
-  for (let i=0;i<80;i++) {
-    const fx=(i*347+i*i*11)%(MAP_W-100)+50;
-    const fy=(i*443+i*7)%(MAP_H-100)+50;
-    const nearTree=obstacles.some(o=>o.type==='tree'&&Math.hypot(o.x-fx,o.y-fy)<40);
-    if (!nearTree) {
-      const fl=flowers[i%flowers.length];
-      ctx.fillStyle=fl.c;
-      ctx.fillRect(fx,fy,fl.s,fl.s);
-      ctx.fillStyle='#c8f0b0';
-      ctx.fillRect(fx-2,fy+3,2,2);
-    }
+  // 2. Caminos orgánicos de tierra (referencia.png)
+  ctx.fillStyle='#dda15e';
+  ctx.strokeStyle='#bc6c25';
+  ctx.lineWidth=24;
+
+  for (const node of pathNodes) {
+    ctx.beginPath();
+    ctx.arc(node.x, node.y, node.r, 0, Math.PI*2);
+    ctx.fill();
   }
 
-  // Límites del mapa (oscuro)
-  ctx.fillStyle='#070f08';
-  ctx.fillRect(0,0,MAP_W,25);
-  ctx.fillRect(0,MAP_H-25,MAP_W,25);
-  ctx.fillRect(0,0,25,MAP_H);
-  ctx.fillRect(MAP_W-25,0,25,MAP_H);
+  // Bordes verdes de hierba sobre el camino de tierra
+  ctx.fillStyle='#1b4332';
+  for (const node of pathNodes) {
+    ctx.beginPath();
+    ctx.arc(node.x, node.y, node.r + 6, 0, Math.PI*2);
+    ctx.stroke();
+  }
+
+  // 3. Decoraciones del terreno (rocas, troncos, hongos, flores)
+  for (const prop of terrainProps) {
+    prop.draw();
+  }
+
+  // 4. Bordes oscuros del mapa
+  ctx.fillStyle='#081c15';
+  ctx.fillRect(0,0,MAP_W,30);
+  ctx.fillRect(0,MAP_H-30,MAP_W,30);
+  ctx.fillRect(0,0,30,MAP_H);
+  ctx.fillRect(MAP_W-30,0,30,MAP_H);
 
   ctx.restore();
 }
@@ -1149,17 +1147,16 @@ function drawEntities() {
   ctx.save();
   ctx.translate(-camera.x, -camera.y);
 
-  // Y-sort: todos los objetos del mundo
   const queue=[];
   if (player) queue.push(player);
   snakes.forEach(s=>queue.push(s));
   obstacles.forEach(o=>queue.push(o));
   if (pefaurNPC) queue.push(pefaurNPC);
   if (chestItem)  queue.push(chestItem);
+
   queue.sort((a,b)=>a.y-b.y);
   queue.forEach(e=>e.draw());
 
-  // Niebla sobre entidades (da profundidad)
   for (const m of mistClouds) m.draw();
 
   ctx.restore();
@@ -1172,7 +1169,6 @@ function drawParticles() {
 function drawNightOverlay() {
   if (nightAlpha<0.02) return;
 
-  // Capa de oscuridad
   const offscreen = document.createElement('canvas');
   offscreen.width = canvasW; offscreen.height = canvasH;
   const oc = offscreen.getContext('2d');
@@ -1181,35 +1177,31 @@ function drawNightOverlay() {
   oc.fillRect(0,0,canvasW,canvasH);
 
   if (hasHeadlamp && player) {
-    // Cono de luz de la linterna frontal
     oc.globalCompositeOperation='destination-out';
     const px=player.x-camera.x, py=player.y-camera.y-10;
 
-    const lightGrad=oc.createRadialGradient(px,py,12,px,py,160);
+    const lightGrad=oc.createRadialGradient(px,py,15,px,py,200);
     lightGrad.addColorStop(0,'rgba(0,0,0,1)');
     lightGrad.addColorStop(0.6,'rgba(0,0,0,0.7)');
     lightGrad.addColorStop(1,'rgba(0,0,0,0)');
     oc.fillStyle=lightGrad;
-    oc.beginPath(); oc.arc(px,py,160,0,Math.PI*2); oc.fill();
+    oc.beginPath(); oc.arc(px,py,200,0,Math.PI*2); oc.fill();
 
-    // Brillo cálido de la linterna
     oc.globalCompositeOperation='source-over';
-    oc.globalAlpha=0.15;
-    oc.fillStyle='rgba(255,240,180,0.4)';
-    oc.beginPath(); oc.arc(px,py,80,0,Math.PI*2); oc.fill();
+    oc.globalAlpha=0.18;
+    oc.fillStyle='rgba(255,240,180,0.45)';
+    oc.beginPath(); oc.arc(px,py,100,0,Math.PI*2); oc.fill();
   }
 
   ctx.drawImage(offscreen,0,0);
 
-  // Efecto de niebla nocturna adicional
   ctx.save();
   ctx.globalAlpha=nightAlpha*0.3;
   ctx.fillStyle='rgba(30,60,80,0.4)';
   ctx.fillRect(0,0,canvasW,canvasH);
   ctx.restore();
 
-  // Luciérnagas nocturnas
-  if (nightAlpha>0.3 && tick%3===0 && Math.random()<0.15) {
+  if (nightAlpha>0.3 && tick%3===0 && Math.random()<0.18) {
     const fx=Math.random()*canvasW, fy=Math.random()*canvasH;
     ctx.save();
     ctx.globalAlpha=Math.random()*0.6+0.2;
@@ -1227,12 +1219,11 @@ function drawFrame() {
   drawParticles();
   drawNightOverlay();
 
-  // Efecto de advertencia energía baja
   if (isTired) {
-    const a=0.1+0.07*Math.sin(tick*0.15);
+    const a=0.12+0.08*Math.sin(tick*0.15);
     ctx.save();
     ctx.strokeStyle=`rgba(255,50,50,${a})`;
-    ctx.lineWidth=10;
+    ctx.lineWidth=12;
     ctx.strokeRect(0,0,canvasW,canvasH);
     ctx.restore();
   }
@@ -1271,8 +1262,9 @@ function startGame() {
   player=new AnggiePlayer(MAP_W/2, MAP_H/2);
   generateMap();
 
-  camera.x=player.x-canvasW/2;
-  camera.y=player.y-canvasH/2;
+  // CENTRAR CÁMARA INMEDIATAMENTE AL JUGADOR AL INICIAR
+  camera.x = player.x - canvasW / 2;
+  camera.y = player.y - canvasH / 2;
 
   showScreen('game-screen');
   audio.init(); audio.resume(); audio.startMusic();
@@ -1335,7 +1327,7 @@ function showScreen(id) {
 }
 
 // ════════════════════════════════════════════════════════════════
-//  INPUT: TECLADO
+//  INPUT: TECLADO & JOYSTICK
 // ════════════════════════════════════════════════════════════════
 window.addEventListener('keydown', e=>{
   const k=e.key.length===1 ? e.key.toLowerCase() : e.key;
@@ -1347,9 +1339,6 @@ window.addEventListener('keyup', e=>{
   if (keys.hasOwnProperty(k)) keys[k]=false;
 });
 
-// ════════════════════════════════════════════════════════════════
-//  INPUT: JOYSTICK VIRTUAL
-// ════════════════════════════════════════════════════════════════
 const joyContainer=document.getElementById('joystick-container');
 const joyBase=document.getElementById('joystick-base');
 const joyStick=document.getElementById('joystick-stick');
@@ -1385,9 +1374,6 @@ joyContainer.addEventListener('mousedown', joyStart);
 window.addEventListener('mousemove', e=>{ if(joystickActive&&!e.touches) joyMove(e); });
 window.addEventListener('mouseup',   ()=>{ if(joystickActive) joyEnd(); });
 
-// ════════════════════════════════════════════════════════════════
-//  BOTONES DOM
-// ════════════════════════════════════════════════════════════════
 function muteToggle() {
   const m=audio.toggleMute();
   const t=m?'🔇':'🔊';
@@ -1411,9 +1397,6 @@ document.getElementById('btn-quit').addEventListener('click',()=>{audio.playClic
 document.getElementById('btn-play-again').addEventListener('click',()=>{audio.playClick();startGame();});
 document.getElementById('btn-menu').addEventListener('click',()=>{audio.playClick();showScreen('menu-screen');});
 
-// ════════════════════════════════════════════════════════════════
-//  RESIZE / INIT
-// ════════════════════════════════════════════════════════════════
 function resize() {
   canvasW=window.innerWidth; canvasH=window.innerHeight;
   const dpr=window.devicePixelRatio||1;

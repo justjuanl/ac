@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-  <meta name="description" content="Una aventura herpetológica para Anggie: captura serpientes Bothrops en la Selva Nublada de Venezuela.">
+  <meta name="description" content="Una aventura herpetológica para Anggie: captura serpientes Bothrops en la Selva Nublada de Venezuela junto al Profesor Péfaur.">
   <meta name="theme-color" content="#0c1e10">
 </head>
 <body>
@@ -21,7 +21,6 @@
   <div id="menu-screen" class="screen active">
     <div class="menu-bg-overlay"></div>
 
-    <!-- Partículas de niebla animadas decorativas -->
     <div class="mist-layer mist-1"></div>
     <div class="mist-layer mist-2"></div>
 
@@ -33,7 +32,7 @@
       </div>
 
       <p class="game-subtitle">
-        Una expedición científica con <strong>Anggie</strong>,<br>investigadora herpetóloga en busca de serpientes del género <em>Bothrops</em>.
+        Una expedición científica con <strong>Anggie</strong><br>y el <strong>Profesor Péfaur</strong> en busca de serpientes del género <em>Bothrops</em>.
       </p>
 
       <div class="highscore-badge">
@@ -69,31 +68,31 @@
           </div>
         </div>
         <div class="instruction-item">
+          <img src="assets/pefaur_portrait.jpg" class="inst-portrait" alt="Profesor Péfaur">
+          <div>
+            <strong>Profesor Péfaur</strong>
+            <p>Profesor titular de herpetología. Apoya a Anggie en el campo con suministros y orientación científica.</p>
+          </div>
+        </div>
+        <div class="instruction-item">
           <span class="instruction-icon">🐍</span>
           <div>
             <strong>Captura</strong>
-            <p>Camina hacia las serpientes para capturarlas. ¡Verás su nombre científico completo!</p>
+            <p>Camina hacia las serpientes para capturarlas. Se desplazarán despacio por el terreno.</p>
           </div>
         </div>
         <div class="instruction-item">
           <span class="instruction-icon">🥤</span>
           <div>
             <strong>Bebida Xpi</strong>
-            <p>Cuando Anggie se canse, <strong>Péfaur</strong> aparecerá con una Xpi amarilla helada para recuperar fuerzas.</p>
+            <p>Cuando Anggie se canse, el <strong>Profesor Péfaur</strong> aparecerá con una Xpi amarilla helada para recuperar sus fuerzas.</p>
           </div>
         </div>
         <div class="instruction-item">
           <span class="instruction-icon">🔦</span>
           <div>
             <strong>Linterna Frontal</strong>
-            <p>De noche, Anggie encontrará una linterna por el camino que le permitirá seguir buscando Bothrops nocturnas.</p>
-          </div>
-        </div>
-        <div class="instruction-item">
-          <span class="instruction-icon">🕹️</span>
-          <div>
-            <strong>Controles</strong>
-            <p>Móvil: joystick virtual. PC: flechas del teclado o W/A/S/D.</p>
+            <p>De noche, Anggie encontrará una linterna por sorpresa en el suelo para seguir buscando Bothrops nocturnas.</p>
           </div>
         </div>
       </div>
@@ -164,7 +163,7 @@
       </div>
     </div>
 
-    <!-- Panel de Captura de Especie (Aparece al atrapar serpiente) -->
+    <!-- Panel de Captura de Especie -->
     <div id="catch-panel" class="catch-panel hidden">
       <div class="catch-panel-inner">
         <div class="catch-portrait-frame">
@@ -198,7 +197,7 @@
         <div class="dialog-portrait-frame">
           <img id="dialog-portrait-img" src="assets/pefaur_portrait.jpg" class="dialog-portrait-img" alt="Personaje">
         </div>
-        <span id="dialog-portrait-name" class="dialog-portrait-name">Péfaur</span>
+        <span id="dialog-portrait-name" class="dialog-portrait-name">Profesor Péfaur</span>
       </div>
       <div class="dialog-content-side">
         <div class="dialog-bubble">
@@ -234,10 +233,10 @@
         <div class="victory-portraits">
           <img src="assets/anggie_portrait.jpg" class="victory-portrait" alt="Anggie">
           <div class="victory-trophy">🏆</div>
-          <img src="assets/pefaur_portrait.jpg" class="victory-portrait" alt="Péfaur">
+          <img src="assets/pefaur_portrait.jpg" class="victory-portrait" alt="Profesor Péfaur">
         </div>
         <h1 class="victory-title">¡INVESTIGACIÓN<br>COMPLETADA!</h1>
-        <p class="victory-sub">Anggie y Péfaur regresan al laboratorio con los especímenes.</p>
+        <p class="victory-sub">Anggie y el Profesor Péfaur regresan al laboratorio con los especímenes.</p>
       </div>
 
       <div class="stats-panel">
@@ -275,7 +274,7 @@
     </div>
   </div>
 
-</div><!-- #app-container -->
+</div>
 
 <script src="audio.js"></script>
 <script src="game.js"></script>
