@@ -52,6 +52,24 @@ class AudioManager {
   }
 
   // --- EFECTOS DE SONIDO (SFX) ---
+
+  // 0. Paso sobre musgo / hierba de selva nublada
+  playStep() {
+    if (this.muted || !this.ctx) return;
+    this.resume();
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    // Ruido suave de paso en vegetación húmeda
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(80 + Math.random()*40, now);
+    osc.frequency.exponentialRampToValueAtTime(40, now + 0.06);
+    gain.gain.setValueAtTime(0.03, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.07);
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc.start(now); osc.stop(now + 0.07);
+  }
   
   // 1. Captura de serpiente Bothrops
   playCatch() {
