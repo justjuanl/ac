@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Bothrops Hunt: Misión Herpetológica de Anggie</title>
+  <!-- Fuente Retro Arcade y Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Una aventura herpetológica lineal para Anggie: busca serpientes Bothrops, bebe Xpi con Jaime Péfaur y explora de noche con linterna frontal.">
+  <meta name="theme-color" content="#1b3f27">
+</head>
+<body>
+
+  <!-- Contenedor Principal de la App -->
+  <div id="app-container">
+
+    <!-- PANTALLA DE INICIO (MENU) -->
+    <div id="menu-screen" class="screen active">
+      <div class="menu-background-overlay"></div>
+      <div class="menu-content">
+        <h1 class="game-title">BOTHROPS<br><span class="highlight">HUNT</span></h1>
+        <p class="game-subtitle">Una aventura herpetológica para <strong>Anggie</strong> en busca de víboras del género <em>Bothrops</em>.</p>
+        
+        <!-- Record de puntuación -->
+        <div class="highscore-badge">
+          <span class="icon">🐍</span> Récord: <span id="menu-highscore">0</span> pts
+        </div>
+
+        <!-- Botones del Menú -->
+        <div class="menu-actions">
+          <button id="btn-play" class="btn btn-primary">
+            <span class="btn-text">INICIAR EXPEDICIÓN</span>
+            <span class="btn-shine"></span>
+          </button>
+          <button id="btn-instructions" class="btn btn-secondary">
+            CÓMO JUGAR
+          </button>
+        </div>
+
+        <div class="sound-toggle-menu">
+          <button id="btn-mute-menu" class="btn-icon">🔊</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANTALLA DE INSTRUCCIONES (MODAL) -->
+    <div id="instructions-modal" class="modal">
+      <div class="modal-content">
+        <h2>INSTRUCCIONES DE CAMPO</h2>
+        <div class="modal-body">
+          <div class="instruction-item">
+            <span class="instruction-icon">👩‍🔬</span>
+            <div>
+              <strong>Protagonista:</strong>
+              <p>Eres <strong>Anggie</strong>, investigadora herpetóloga explorando la selva.</p>
+            </div>
+          </div>
+          <div class="instruction-item">
+            <span class="instruction-icon">🐍</span>
+            <div>
+              <strong>Objetivo:</strong>
+              <p>Busca y captura serpientes del género <em>Bothrops</em>. ¡Atento a sus nombres científicos!</p>
+            </div>
+          </div>
+          <div class="instruction-item">
+            <span class="instruction-icon">🥤</span>
+            <div>
+              <strong>Cansancio y Ayuda:</strong>
+              <p>Si te cansas, busca a tu colega <strong>Jaime Péfaur</strong> para recargar energías con una lata helada de <strong>Xpi</strong>.</p>
+            </div>
+          </div>
+          <div class="instruction-item">
+            <span class="instruction-icon">🔦</span>
+            <div>
+              <strong>Exploración Nocturna:</strong>
+              <p>Al anochecer, localiza el cofre con la linterna frontal para seguir la búsqueda en la oscuridad.</p>
+            </div>
+          </div>
+        </div>
+        <button id="btn-close-instructions" class="btn btn-secondary">ENTENDIDO</button>
+      </div>
+    </div>
+
+    <!-- PANTALLA DE JUEGO (GAMEPLAY) -->
+    <div id="game-screen" class="screen">
+      
+      <!-- HUD Superior -->
+      <div class="hud">
+        <div class="hud-item player-container">
+          <span class="hud-label">HERPETÓLOGA</span>
+          <span class="hud-value hero-name">Anggie 👩‍🔬</span>
+        </div>
+
+        <div class="hud-item score-container">
+          <span class="hud-label">SERPIENTES</span>
+          <span id="hud-score" class="hud-value">0</span>
+        </div>
+
+        <div class="hud-controls">
+          <button id="btn-pause" class="btn-icon">⏸️</button>
+          <button id="btn-mute" class="btn-icon">🔊</button>
+        </div>
+      </div>
+
+      <!-- Barra de Misión de la Historia -->
+      <div id="hud-objective-bar">
+        <span class="obj-icon">🎯</span>
+        <span id="obj-text">Misión: Captura 3 serpientes Bothrops</span>
+      </div>
+
+      <!-- Banner de Especie Descubierta -->
+      <div id="species-banner" class="species-banner hidden">
+        <div class="species-icon">🐍</div>
+        <div class="species-info">
+          <span class="species-label">¡NUEVA ESPECIE CAPTURADA!</span>
+          <h3 id="species-name">Bothrops atrox</h3>
+          <span id="species-common" class="species-common">(Jergón del Oriente)</span>
+        </div>
+      </div>
+
+      <!-- Canvas del Juego -->
+      <canvas id="gameCanvas"></canvas>
+
+      <!-- Joystick Virtual (Mobile Only) -->
+      <div id="joystick-container">
+        <div id="joystick-base">
+          <div id="joystick-stick"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL DE DIÁLOGO / HISTORIA (CUTSCENES) -->
+    <div id="dialog-modal" class="modal-dialog hidden">
+      <div class="dialog-box">
+        <div class="dialog-header">
+          <div id="dialog-portrait" class="dialog-portrait"></div>
+          <div class="dialog-speaker-info">
+            <h3 id="dialog-speaker-name">Jaime Péfaur</h3>
+            <span id="dialog-speaker-title" class="speaker-title">Herpetólogo Senior</span>
+          </div>
+        </div>
+        <div class="dialog-body">
+          <p id="dialog-text">¡Hola Anggie! Veo que has estado trabajando duro. Toma esta bebida energética Xpi helada para recuperar tus fuerzas.</p>
+        </div>
+        <div class="dialog-footer">
+          <button id="btn-dialog-next" class="btn btn-primary btn-small">CONTINUAR ➔</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MENÚ DE PAUSA -->
+    <div id="pause-screen" class="modal">
+      <div class="modal-content text-center">
+        <h2>EXPEDICIÓN PAUSADA</h2>
+        <div class="modal-body">
+          <p>¿Deseas tomar un descanso?</p>
+        </div>
+        <div class="menu-actions vertical">
+          <button id="btn-resume" class="btn btn-primary">REANUDAR</button>
+          <button id="btn-restart" class="btn btn-secondary">REINICIAR EXPEDICIÓN</button>
+          <button id="btn-quit" class="btn btn-danger">SALIR AL MENÚ</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANTALLA DE INFORME FINAL (VICTORIA) -->
+    <div id="gameover-screen" class="screen">
+      <div class="gameover-content">
+        <h1 class="gameover-title highlight-title">¡INVESTIGACIÓN COMPLETADA!</h1>
+        <p class="victory-subtitle">Felicidades <strong>Anggie</strong>, la expedición herpetológica ha sido un rotundo éxito.</p>
+        
+        <div class="stats-panel">
+          <div class="stat-row highlight-row">
+            <span>PUNTUACIÓN CIENTÍFICA:</span>
+            <span id="go-score">0</span>
+          </div>
+          <div class="stat-row">
+            <span>SERPIENTES BOTHROPS:</span>
+            <span id="go-caught">0</span>
+          </div>
+          <div class="stat-row">
+            <span>BEBIDAS XPI CONSUMIDAS:</span>
+            <span>1 🥤</span>
+          </div>
+          <div class="stat-row">
+            <span>EQUIPO UTILIZADO:</span>
+            <span>Linterna Frontal 🔦</span>
+          </div>
+
+          <!-- Catálogo de Especies Capturadas -->
+          <div class="species-catalog">
+            <h4>ESPECIES REGISTRADAS:</h4>
+            <ul id="species-list">
+              <!-- Rellenado dinámicamente -->
+            </ul>
+          </div>
+        </div>
+
+        <div class="menu-actions vertical">
+          <button id="btn-play-again" class="btn btn-primary">REPETIR EXPEDICIÓN</button>
+          <button id="btn-menu" class="btn btn-secondary">VOLVER AL MENÚ</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Scripts -->
+  <script src="audio.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>

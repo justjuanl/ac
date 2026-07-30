@@ -1,0 +1,730 @@
+/* ==========================================================================
+   BOTHROPS HUNT - HOJA DE ESTILOS (style.css)
+   ========================================================================== */
+
+:root {
+  --forest-dark: #0f2214;
+  --forest-mid: #183a22;
+  --forest-light: #2c683e;
+  --emerald: #39b54a;
+  --gold-bright: #ffd700;
+  --gold-dark: #ccab00;
+  --gold-glow: rgba(255, 215, 0, 0.4);
+  --yellow-xpi: #ffea00;
+  --text-main: #f5fcf7;
+  --text-muted: #a3c4b0;
+  --danger: #d32f2f;
+  --glass-bg: rgba(12, 34, 20, 0.85);
+  --glass-border: rgba(255, 255, 255, 0.15);
+  --retro-font: 'Press Start 2P', monospace;
+  --sans-font: 'Outfit', sans-serif;
+}
+
+/* --- Reseteo y Configuración Global --- */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: #050a06;
+  font-family: var(--sans-font);
+  color: var(--text-main);
+}
+
+#app-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* --- Pantallas (Screens) --- */
+.screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+  opacity: 0;
+  transition: opacity 0.4s ease-in-out;
+}
+
+.screen.active {
+  display: flex;
+  opacity: 1;
+  z-index: 20;
+}
+
+/* --- Pantalla de Inicio (Menu Screen) --- */
+#menu-screen {
+  background: url('assets/forest_background.jpg') no-repeat center center;
+  background-size: cover;
+}
+
+.menu-background-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    180deg,
+    rgba(15, 34, 20, 0.65) 0%,
+    rgba(8, 18, 11, 0.92) 100%
+  );
+  z-index: 1;
+}
+
+.menu-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 20px;
+  max-width: 520px;
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+}
+
+.game-title {
+  font-family: var(--retro-font);
+  font-size: 2.2rem;
+  line-height: 1.3;
+  color: var(--text-main);
+  text-shadow: 
+    0 4px 0 #071009,
+    0 8px 0 rgba(0, 0, 0, 0.5),
+    0 0 20px rgba(57, 181, 74, 0.4);
+  letter-spacing: -1px;
+  animation: floatTitle 3s ease-in-out infinite alternate;
+}
+
+.game-title .highlight {
+  color: var(--gold-bright);
+  text-shadow: 
+    0 4px 0 #6e5c00,
+    0 8px 0 rgba(0, 0, 0, 0.5),
+    0 0 25px rgba(255, 215, 0, 0.6);
+}
+
+.game-subtitle {
+  font-size: 1.05rem;
+  color: var(--text-muted);
+  font-weight: 300;
+  max-width: 420px;
+  line-height: 1.5;
+}
+
+.highscore-badge {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  padding: 10px 22px;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* --- Botones --- */
+.btn {
+  font-family: var(--sans-font);
+  font-weight: 800;
+  font-size: 1.1rem;
+  letter-spacing: 1px;
+  padding: 14px 35px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  max-width: 300px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--emerald) 0%, var(--forest-light) 100%);
+  color: #fff;
+  border-bottom: 4px solid var(--forest-dark);
+}
+
+.btn-primary:active {
+  transform: translateY(3px);
+  border-bottom-width: 1px;
+}
+
+.btn-secondary {
+  background: var(--glass-bg);
+  color: var(--text-main);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.btn-secondary:active {
+  background: rgba(255, 255, 255, 0.1);
+  transform: scale(0.98);
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, var(--danger) 0%, #7f0000 100%);
+  color: #fff;
+  border-bottom: 4px solid #4a0000;
+}
+
+.btn-small {
+  padding: 10px 20px;
+  font-size: 0.95rem;
+  max-width: 180px;
+}
+
+.btn-shine {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.25) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: skewX(-25deg);
+  animation: shine 3s infinite;
+}
+
+.menu-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 100%;
+  align-items: center;
+}
+
+.menu-actions.vertical {
+  width: 100%;
+  gap: 12px;
+}
+
+.btn-icon {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  color: var(--text-main);
+  font-size: 1.2rem;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+}
+
+.btn-icon:active {
+  transform: scale(0.9);
+}
+
+/* --- Modales e Instrucciones --- */
+.modal {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(5, 10, 6, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 100;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.modal.active {
+  display: flex;
+  opacity: 1;
+}
+
+.modal-content {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  padding: 28px;
+  border-radius: 20px;
+  width: 90%;
+  max-width: 460px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.modal-content h2 {
+  font-family: var(--retro-font);
+  font-size: 1.1rem;
+  color: var(--gold-bright);
+  text-align: center;
+}
+
+.modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.instruction-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.instruction-icon {
+  font-size: 1.6rem;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 8px;
+  border-radius: 12px;
+  width: 46px;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.instruction-item strong {
+  font-size: 0.95rem;
+  color: var(--text-main);
+  display: block;
+}
+
+.instruction-item p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+/* --- Pantalla de Juego y HUD --- */
+#game-screen {
+  background: #0f2214;
+}
+
+#gameCanvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+
+.hud {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  right: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 30;
+  pointer-events: none;
+}
+
+.hud-item {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  padding: 8px 16px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.hero-name {
+  color: var(--gold-bright) !important;
+}
+
+.hud-label {
+  font-size: 0.65rem;
+  font-family: var(--retro-font);
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.hud-value {
+  font-size: 0.95rem;
+  font-family: var(--retro-font);
+  color: var(--text-main);
+  font-weight: 700;
+}
+
+.hud-controls {
+  display: flex;
+  gap: 8px;
+  pointer-events: auto;
+}
+
+/* --- Barra de Objetivo de la Misión --- */
+#hud-objective-bar {
+  position: absolute;
+  top: 75px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(12, 34, 20, 0.9);
+  border: 1px solid var(--gold-bright);
+  padding: 8px 18px;
+  border-radius: 30px;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-main);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4), 0 0 10px rgba(255, 215, 0, 0.3);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: all 0.3s ease;
+}
+
+#hud-objective-bar .obj-icon {
+  font-size: 1rem;
+  animation: pulse 1.5s infinite alternate;
+}
+
+/* --- Banner de Especie Descubierta --- */
+.species-banner {
+  position: absolute;
+  top: 125px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, rgba(24, 58, 34, 0.95) 0%, rgba(12, 34, 20, 0.95) 100%);
+  border: 2px solid var(--gold-bright);
+  border-radius: 16px;
+  padding: 12px 24px;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.6), 0 0 20px rgba(255, 215, 0, 0.4);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  animation: slideDownBanner 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.species-banner.hidden {
+  display: none;
+}
+
+.species-icon {
+  font-size: 2.2rem;
+  background: rgba(255, 215, 0, 0.15);
+  border-radius: 12px;
+  padding: 8px;
+}
+
+.species-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.species-label {
+  font-family: var(--retro-font);
+  font-size: 0.6rem;
+  color: var(--gold-bright);
+  letter-spacing: 0.5px;
+}
+
+.species-info h3 {
+  font-family: 'Outfit', sans-serif;
+  font-style: italic;
+  font-weight: 800;
+  font-size: 1.2rem;
+  color: #ffffff;
+}
+
+.species-common {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* --- Modal de Diálogo (Cutscenes de la Historia) --- */
+.modal-dialog {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 92%;
+  max-width: 580px;
+  z-index: 200;
+  display: flex;
+  justify-content: center;
+}
+
+.modal-dialog.hidden {
+  display: none;
+}
+
+.dialog-box {
+  background: rgba(10, 26, 16, 0.95);
+  border: 2px solid var(--gold-bright);
+  border-radius: 18px;
+  padding: 20px;
+  width: 100%;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 15px rgba(255, 215, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  animation: popUpDialog 0.3s ease-out;
+}
+
+.dialog-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding-bottom: 10px;
+}
+
+.dialog-portrait {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  background: #183a22;
+  border: 2px solid var(--gold-bright);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  flex-shrink: 0;
+}
+
+.dialog-speaker-info h3 {
+  font-family: var(--retro-font);
+  font-size: 0.95rem;
+  color: var(--gold-bright);
+}
+
+.speaker-title {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.dialog-body p {
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--text-main);
+  min-height: 50px;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* --- Joystick Virtual --- */
+#joystick-container {
+  position: absolute;
+  bottom: 40px;
+  left: 40px;
+  width: 130px;
+  height: 130px;
+  z-index: 40;
+  display: none;
+  justify-content: center;
+  align-items: center;
+}
+
+#joystick-base {
+  width: 120px;
+  height: 120px;
+  background: rgba(12, 34, 20, 0.55);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+#joystick-stick {
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, var(--emerald) 0%, var(--forest-light) 100%);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 50%;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4), 0 0 10px rgba(57, 181, 74, 0.5);
+  transition: transform 0.05s ease-out;
+}
+
+/* --- Pantalla de Fin de Juego (Game Over / Informe) --- */
+#gameover-screen {
+  background: rgba(8, 18, 11, 0.96);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.gameover-content {
+  text-align: center;
+  padding: 20px;
+  max-width: 500px;
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.highlight-title {
+  font-family: var(--retro-font);
+  font-size: 1.3rem;
+  color: var(--gold-bright);
+  line-height: 1.4;
+  text-shadow: 0 0 20px var(--gold-glow);
+}
+
+.victory-subtitle {
+  font-size: 1rem;
+  color: var(--text-muted);
+}
+
+.stats-panel {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  padding: 22px;
+  border-radius: 16px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.stat-row.highlight-row {
+  font-family: var(--retro-font);
+  font-size: 0.85rem;
+  color: var(--gold-bright);
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+/* Catálogo de Especies en Pantalla Final */
+.species-catalog {
+  margin-top: 10px;
+  text-align: left;
+  border-top: 1px dashed rgba(255,255,255,0.15);
+  padding-top: 10px;
+}
+
+.species-catalog h4 {
+  font-family: var(--retro-font);
+  font-size: 0.7rem;
+  color: var(--gold-bright);
+  margin-bottom: 8px;
+}
+
+.species-catalog ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 120px;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+.species-catalog li {
+  font-size: 0.85rem;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 6px 10px;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.species-catalog li em {
+  font-weight: 700;
+  color: #ffffff;
+}
+
+/* --- Animaciones Keyframe --- */
+@keyframes floatTitle {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-8px); }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 0.9; }
+  100% { transform: scale(1.08); opacity: 1; }
+}
+
+@keyframes shine {
+  0% { left: -100%; }
+  20% { left: 100%; }
+  100% { left: 100%; }
+}
+
+@keyframes slideDownBanner {
+  0% { transform: translate(-50%, -30px); opacity: 0; }
+  100% { transform: translate(-50%, 0); opacity: 1; }
+}
+
+@keyframes popUpDialog {
+  0% { transform: translate(-50%, 40px); opacity: 0; }
+  100% { transform: translate(-50%, 0); opacity: 1; }
+}
+
+/* --- Media Queries --- */
+@media (pointer: coarse) {
+  #joystick-container {
+    display: flex;
+  }
+}
+
+@media (max-height: 520px) {
+  .game-title { font-size: 1.5rem; }
+  .menu-content { gap: 12px; }
+  #hud-objective-bar { top: 60px; font-size: 0.75rem; padding: 5px 12px; }
+  .modal-dialog { bottom: 10px; }
+  .dialog-box { padding: 12px; }
+}
