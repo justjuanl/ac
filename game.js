@@ -1059,7 +1059,7 @@ function catchSnake(snake, idx) {
   if (!catalog.some(s => s.id === snake.species.id)) catalog.push(snake.species);
 
   // ── PROGRESIÓN NARRATIVA ──────────────────────────────────────
-  if (storyPhase === 'phase1_day' && caught >= 5) {
+  if (storyPhase === 'phase1_day' && caught >= 8) {
     storyPhase = 'cutscene_tired';
     isTired = true; energyTarget = 10; updateEnergyBar();
     setTimeout(() => {
@@ -1068,7 +1068,7 @@ function catchSnake(snake, idx) {
         'Habla con el Profesor Péfaur para recuperar energías', 1);
     }, 1200);
   }
-  else if (storyPhase === 'phase2_afternoon' && caught >= 8) {
+  else if (storyPhase === 'phase2_afternoon' && caught >= 15) {
     storyPhase = 'phase3_dusk';
     setPhaseUI('🌙', 'ATARDECER EN LA SELVA', '¡Explora la selva al anochecer!', 2);
 
@@ -1082,16 +1082,16 @@ function catchSnake(snake, idx) {
       });
     }, 2000);
   }
-  else if (storyPhase === 'phase3_night' && caught >= 10) {
+  else if (storyPhase === 'phase3_night' && caught >= 20) {
     storyPhase = 'phase4_lamp_spawn';
     // Linterna aparece de sorpresa JUSTO AL LADO DE ANGGIE
     chestItem = new ChestItem(player.x + 70, player.y + 20);
-    setPhaseUI('🔦', '¡ALGO BRILLA EN EL SUELO!',
-      'Camina hacia el resplandor de la linterna', 0);
+    setPhaseUI('Luz', '¡ALGO BRILLA EN EL SUELO!',
+      'Camina hacia el resplandor', 0);
     burst(chestItem.x, chestItem.y, '#ffea00', 30, 2.5);
     floatText(chestItem.x, chestItem.y - 15, '¡Linterna Sorpresa!', '#ffea00');
   }
-  else if (storyPhase === 'phase4_night_lamp' && caught >= 8) {
+  else if (storyPhase === 'phase4_night_lamp' && caught >= 27) {
     storyPhase = 'cutscene_victory';
     pefaurNPC = new PefaurNPC(player.x + 100, player.y - 20);
     setPhaseUI('🏁', '¡MUESTREO COMPLETADO!',
