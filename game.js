@@ -988,7 +988,7 @@ function catchSnake(snake, idx) {
   if (!catalog.some(s => s.id === snake.species.id)) catalog.push(snake.species);
 
   // ── PROGRESIÓN NARRATIVA ──────────────────────────────────────
-  if (storyPhase === 'phase1_day' && caught >= 3) {
+  if (storyPhase === 'phase1_day' && caught >= 5) {
     storyPhase = 'cutscene_tired';
     isTired = true; energyTarget = 10; updateEnergyBar();
     setTimeout(() => {
@@ -997,7 +997,7 @@ function catchSnake(snake, idx) {
         'Habla con el Profesor Péfaur para recuperar energías', 1);
     }, 1200);
   }
-  else if (storyPhase === 'phase2_afternoon' && caught >= 5) {
+  else if (storyPhase === 'phase2_afternoon' && caught >= 8) {
     storyPhase = 'phase3_dusk';
     setPhaseUI('🌙', 'ATARDECER EN LA SELVA', '¡Explora la selva al anochecer!', 2);
 
@@ -1011,7 +1011,7 @@ function catchSnake(snake, idx) {
       });
     }, 2000);
   }
-  else if (storyPhase === 'phase3_night' && caught >= 6) {
+  else if (storyPhase === 'phase3_night' && caught >= 10) {
     storyPhase = 'phase4_lamp_spawn';
     // Linterna aparece de sorpresa JUSTO AL LADO DE ANGGIE
     chestItem = new ChestItem(player.x + 70, player.y + 20);
