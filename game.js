@@ -487,6 +487,7 @@ class Obstacle {
   }
 }
 
+/*
 class TerrainProp {
   constructor(x, y, type) {
     this.x = x; this.y = y; this.type = type;
@@ -519,6 +520,76 @@ class TerrainProp {
     }
   }
 }
+*/
+
+/*
+class TerrainProp {
+  constructor(x, y, type) {
+    this.x = x; this.y = y; this.type = type;
+  }
+  draw() {
+    if (this.type === 'rock') {
+      drawSprite(SP.rock, this.x - 20, this.y - 16, 3.2);
+    } else if (this.type === 'log') {
+      drawSprite(SP.log, this.x - 24, this.y - 14, 3.2);
+    } else if (this.type === 'mushroom') {
+      // Usarthis.x y this.y directamente (ya ajustados por ctx.translate en drawMap)
+      ctx.save();
+      ctx.fillStyle = '#e63946';
+      ctx.beginPath(); ctx.arc(this.x, this.y, 6, 0, Math.PI, true); ctx.fill();
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(this.x - 2, this.y, 4, 6);
+      ctx.fillRect(this.x - 3, this.y - 4, 2, 2); ctx.fillRect(this.x + 1, this.y - 5, 2, 2);
+      ctx.restore();
+    } else if (this.type === 'flower') {
+      // Usar this.x y this.y directamente
+      ctx.save();
+      ctx.fillStyle = '#ffb703';
+      ctx.beginPath(); ctx.arc(this.x, this.y, 4, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#ff006e';
+      ctx.beginPath(); ctx.arc(this.x - 3, this.y, 3, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(this.x + 3, this.y, 3, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(this.x, this.y - 3, 3, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(this.x, this.y + 3, 3, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+    }
+  }
+}
+*/
+
+class TerrainProp {
+  constructor(x, y, type) {
+    this.x = x; this.y = y; this.type = type;
+  }
+  draw() {
+    if (this.type === 'rock') {
+      drawSprite(SP.rock, this.x - 20, this.y - 16, 3.2);
+    } else if (this.type === 'log') {
+      drawSprite(SP.log, this.x - 24, this.y - 14, 3.2);
+    } else if (this.type === 'mushroom') {
+      const sx = this.x - camera.x, sy = this.y - camera.y;
+      ctx.save();
+      ctx.fillStyle = '#e63946';
+      ctx.beginPath(); ctx.arc(sx, sy, 6, 0, Math.PI, true); ctx.fill();
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(sx - 2, sy, 4, 6);
+      ctx.fillRect(sx - 3, sy - 4, 2, 2); ctx.fillRect(sx + 1, sy - 5, 2, 2);
+      ctx.restore();
+    } else if (this.type === 'flower') {
+      const sx = this.x - camera.x, sy = this.y - camera.y;
+      ctx.save();
+      ctx.fillStyle = '#ffb703';
+      ctx.beginPath(); ctx.arc(sx, sy, 4, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#ff006e';
+      ctx.beginPath(); ctx.arc(sx - 3, sy, 3, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(sx + 3, sy, 3, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(sx, sy - 3, 3, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(sx, sy + 3, 3, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+    }
+  }
+}
+
 
 // ════════════════════════════════════════════════════════════════
 //  PROFESOR PÉFAUR NPC
@@ -834,49 +905,49 @@ const STORY = {
   pefaur_arrives: [
     {
       who: 'Profesor Péfaur', img: 'assets/pefaur_portrait.jpg',
-      text: '¡Anggie! Te ves agotada... ¡has estado buscando Bothrops sin parar por toda la selva!'
+      text: '¡Anggie! Hijita te ves agotada... ¡has estado buscando Bothrops todo el dia!'
     },
     {
       who: 'Anggie', img: 'assets/anggie_portrait.jpg',
-      text: 'Profesor Péfaur... sí, ya no puedo más... ¡pero hay tantas especies que registrar!'
+      text: 'Profesor Péfaur... ya no puedo más... ¡pero hay tantas especies que registrar!'
     },
     {
       who: 'Profesor Péfaur', img: 'assets/pefaur_portrait.jpg',
-      text: 'Toma esta Xpi bien helada. ¡Recarga energías y continuamos el muestreo!'
+      text: 'Toma esta Spi de esas que les gustan a ustedes ¡Recarga energías y continuamos el muestreo!'
     },
     {
       who: 'Anggie', img: 'assets/anggie_portrait.jpg',
-      text: '¡Muchas gracias, Profesor! Esta Xpi helada es justo lo que necesitaba.'
+      text: '¡Muchas gracias, Profesor! Esta Spi helada es justo lo que necesitaba.'
     },
   ],
   night_falling: [
     {
       who: 'Anggie', img: 'assets/anggie_portrait.jpg',
-      text: '¡Vaya... está anocheciendo! Las especies nocturnas van a salir ahora.'
+      text: '¡Chale se fue la luz... ah no, está anocheciendo! Las especies nocturnas van a salir ahora.'
     },
     {
       who: 'Profesor Péfaur', img: 'assets/pefaur_portrait.jpg',
-      text: '¡Exacto, Anggie! Las Bothrops bilineatus y taeniatus son más activas en la oscuridad.'
+      text: '¡Exacto, Anggie! Las Bothrops bilineatus y taeniatus son más activas en la noche.'
     },
   ],
   found_headlamp: [
     {
       who: 'Anggie', img: 'assets/anggie_portrait.jpg',
-      text: '¡Oh! ¡Hay algo brillando en el suelo entre la vegetación! ¡Es una linterna frontal!'
+      text: '¡Oh! ¡Hay algo brillando en el suelo entre la vegetación!'
     },
     {
       who: 'Anggie', img: 'assets/anggie_portrait.jpg',
-      text: '¡Qué gran sorpresa! Con esto puedo seguir buscando Bothrops nocturnas en la oscuridad. ¡Vamos!'
+      text: '¡Una linterna! Con esto puedo biologar de noche ¡Vamos!'
     },
   ],
   victory: [
     {
       who: 'Profesor Péfaur', img: 'assets/pefaur_portrait.jpg',
-      text: '¡Extraordinario trabajo, Anggie! Hemos completado el muestreo de campo.'
+      text: '¡Extraordinario trabajo, Anggie! Hemos completado el muestreo de campo para la tesis!'
     },
     {
       who: 'Profesor Péfaur', img: 'assets/pefaur_portrait.jpg',
-      text: 'Ya tenemos especímenes de varias especies del género Bothrops. ¡Material invaluable!'
+      text: 'Ya tenemos especímenes de varias especies del género Bothrops, Hay que llevarle esto a la profe Leida!'
     },
     {
       who: 'Anggie', img: 'assets/anggie_portrait.jpg',
@@ -884,7 +955,7 @@ const STORY = {
     },
     {
       who: 'Anggie', img: 'assets/anggie_portrait.jpg',
-      text: '¡Esta investigación en la Selva Nublada venezolana va a ser histórica! ¡Volvamos al laboratorio!'
+      text: '¡Esta investigación va a ser histórica! ¡Volvamos al laboratorio!'
     },
   ],
 };
@@ -1159,9 +1230,9 @@ function drawMap() {
     ctx.stroke();
   }
 
-  for (const prop of terrainProps) {
-    prop.draw();
-  }
+  // for (const prop of terrainProps) {
+  //  prop.draw();
+  //}
 
   ctx.fillStyle = '#0f2b1d';
   ctx.fillRect(-200, -200, MAP_W + 400, 230);
@@ -1178,6 +1249,7 @@ function drawEntities() {
   if (player) queue.push(player);
   snakes.forEach(s => queue.push(s));
   obstacles.forEach(o => queue.push(o));
+  terrainProps.forEach(p => queue.push(p)); //añadida
   if (pefaurNPC) queue.push(pefaurNPC);
   if (chestItem) queue.push(chestItem);
 
